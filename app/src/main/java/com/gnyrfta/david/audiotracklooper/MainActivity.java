@@ -10,6 +10,7 @@ import android.net.Uri;
 import android.os.Bundle;
 import android.util.DisplayMetrics;
 import android.util.Log;
+import android.util.TypedValue;
 import android.view.MotionEvent;
 import android.view.View;
 import android.view.animation.AlphaAnimation;
@@ -18,6 +19,7 @@ import android.view.animation.LinearInterpolator;
 import android.widget.ImageButton;
 import android.widget.LinearLayout;
 
+
 import com.google.android.gms.appindexing.Action;
 import com.google.android.gms.appindexing.AppIndex;
 import com.google.android.gms.common.api.GoogleApiClient;
@@ -25,6 +27,8 @@ import com.google.android.gms.common.api.GoogleApiClient;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.Arrays;
+
+
 
 /**
         Copyright 2016, 2016 David Jacobsson
@@ -122,6 +126,11 @@ public class MainActivity extends Activity {
     public volatile boolean addBuffer18=false;
     public volatile boolean addBuffer19=false;
     public volatile boolean addBuffer20=false;
+    public volatile boolean addBuffer21=false;
+    public volatile boolean addBuffer22=false;
+    public volatile boolean addBuffer23=false;
+    public volatile boolean addBuffer24=false;
+
     //
     public volatile boolean stopStream=false;
     //
@@ -137,6 +146,10 @@ public class MainActivity extends Activity {
     public volatile boolean letIn10=false;
     public volatile boolean letIn11=false;
     public volatile boolean letIn12=false;
+    public volatile boolean letIn13=false;
+    public volatile boolean letIn14=false;
+    public volatile boolean letIn15=false;
+    public volatile boolean letIn16=false;
 
     public volatile int addCounter1=0;
     public volatile int addCounter2=0;
@@ -201,6 +214,7 @@ public class MainActivity extends Activity {
     public volatile int bufferLength=200;
 
     public volatile float numberOfStreams=0;
+    public volatile int numberOfLiveTracks=0;
 //Get Drawables:
     private static Drawable greenButtonLightOn = MyApp.context().getResources().getDrawable(R.drawable.green_square_button_with_light);
     private static Drawable greenButtonLightOff = MyApp.context().getResources().getDrawable(R.drawable.green_square_button);
@@ -253,7 +267,7 @@ public class MainActivity extends Activity {
      * ATTENTION: This was auto-generated to implement the App Indexing API.
      * See https://g.co/AppIndexing/AndroidStudio for more information.
      */
-    private GoogleApiClient client;
+   private GoogleApiClient client;
     /*This is already set in Manifest - might not be necessary. */
     private static final int REQUEST_EXTERNAL_STORAGE = 1;
     private static String[] PERMISSIONS_STORAGE = {
@@ -269,7 +283,7 @@ public class MainActivity extends Activity {
         int MODE_STREAM = 1;
         try {
             WavInfo wi = new WavInfo();
-            InputStream is = getResources().openRawResource(R.raw.beat1_mono);
+            InputStream is = getResources().openRawResource(R.raw.beat1);
             int dataSize = wi.readHeader(is);
             byte[] data = new byte[dataSize];
             is.read(data, 0, data.length);
@@ -489,6 +503,10 @@ public class MainActivity extends Activity {
                     {
                         Log.d(TAG,"Letting tracks in.");
                         letIn1=true;
+                    }
+                    else if(numberOfStreams-numberOfLiveTracks==0)
+                    {
+                        //should start immediately, but don't know how to do this yet.
                     }
                     else if(!letIn1)
                     {
@@ -1124,9 +1142,414 @@ public class MainActivity extends Activity {
                         temp = resultingBuffer;
                     }
                 }
+                if(addBuffer12)
+                {
+                    if(i==0)//actually should be 37220, but i is always a multiple of bufferlength, which is 100.Fun fact : there is an asteroid called 18610 ArthurDent.
+                    {
+                        Log.d(TAG,"Letting tracks in.");
+                        letIn12=true;
+                    }
+                    else if(!letIn12)
+                    {
+                        boolean lightOn=false;
+                        if(i%(bufferLength*100)==0)
+                        {
+                            if(lightOn)
+                            {
+                                //light off
+                                // ((ImageButton) findViewById(R.id.buttonEleven)).setImageDrawable(redButtonLightOff);
+                                //   setOff11();
+                                lightOn=false;
+                            }
+                            else if(!lightOn)
+                            {
+                                //  setOn11();
+                                //((ImageButton) findViewById(R.id.buttonEleven)).setImageDrawable(redButtonLightOn);
+                                lightOn=true;
+                                //light on.
+                            }
+                            Log.d(TAG,"GOOD BLINK RATE? ");
+                        }
+                        //Blink
+                    }
+                    if(letIn12) {
+
+                        byte[] subBuffer = Arrays.copyOfRange(data12, addCounter12, addCounter12 + bufferLength);
+                        byte[] temporaryBufferWithAdjustedAmplitude = new byte[bufferLength];
+                        for (int m = 0; m < subBuffer.length; m += 2) {
+                            short buf1a = temp[m + 1];
+                            short buf2a = temp[m];
+                            buf1a = (short) ((buf1a & 0xff) << 8);
+                            buf2a = (short) (buf2a & 0xff);
+                            short buf1b = subBuffer[m + 1];
+                            short buf2b = subBuffer[m];
+                            buf1b = (short) ((buf1b & 0xff) << 8);
+                            buf2b = (short) (buf2b & 0xff);
+                            //Dividing amplitude by half and writing to temporary buffer.
+
+                            //Dividing amplitude by half and writing to temporary other buffer.
+                            short dudette = (short) (buf1b + buf2b);
+                            float fdudette = (float) (dudette / numberOfStreams);
+                            dudette = (short) fdudette;
+                            temporaryBufferWithAdjustedAmplitude[m] = (byte) dudette;
+                            temporaryBufferWithAdjustedAmplitude[m + 1] = (byte) (dudette >> 8);
+                            //Getting values from temporary buffer.
+
+                            //Getting values from temporary other buffer.
+                            buf1b = temporaryBufferWithAdjustedAmplitude[m + 1];
+                            buf2b = temporaryBufferWithAdjustedAmplitude[m];
+                            buf1b = (short) ((buf1b & 0xff) << 8);
+                            buf2b = (short) (buf2b & 0xff);
+                            //Adding buffers.
+                            short buf1c = (short) (buf1a + buf1b);
+                            short buf2c = (short) (buf2a + buf2b);
+                            short res = (short) (buf1c + buf2c);
+                            resultingBuffer[m] = (byte) res;
+                            resultingBuffer[m + 1] = (byte) (res >> 8);
+                            addCounter12 += 2;
+                            Log.d(TAG,"should be playing #12");
+                            if (addCounter12 >= (data12.length - bufferLength))
+                            {
+                                addCounter12 = 0;
+                            }
+                        }
+                        temp = resultingBuffer;
+                    }
+                }
+                if(addBuffer13)
+                {
+                    if(i==0)//actually should be 37220, but i is always a multiple of bufferlength, which is 100.Fun fact : there is an asteroid called 18610 ArthurDent.
+                    {
+                        Log.d(TAG,"Letting tracks in.");
+                        letIn13=true;
+                    }
+                    else if(!letIn13)
+                    {
+                        boolean lightOn=false;
+                        if(i%(bufferLength*100)==0)
+                        {
+                            if(lightOn)
+                            {
+                                //light off
+                                // ((ImageButton) findViewById(R.id.buttonEleven)).setImageDrawable(redButtonLightOff);
+                                //   setOff11();
+                                lightOn=false;
+                            }
+                            else if(!lightOn)
+                            {
+                                //  setOn11();
+                                //((ImageButton) findViewById(R.id.buttonEleven)).setImageDrawable(redButtonLightOn);
+                                lightOn=true;
+                                //light on.
+                            }
+                            Log.d(TAG,"GOOD BLINK RATE? ");
+                        }
+                        //Blink
+                    }
+                    if(letIn13) {
+                        byte[] subBuffer = Arrays.copyOfRange(data13, addCounter13, addCounter13 + bufferLength);
+                        byte[] temporaryBufferWithAdjustedAmplitude = new byte[bufferLength];
+                        for (int m = 0; m < subBuffer.length; m += 2) {
+                            short buf1a = temp[m + 1];
+                            short buf2a = temp[m];
+                            buf1a = (short) ((buf1a & 0xff) << 8);
+                            buf2a = (short) (buf2a & 0xff);
+                            short buf1b = subBuffer[m + 1];
+                            short buf2b = subBuffer[m];
+                            buf1b = (short) ((buf1b & 0xff) << 8);
+                            buf2b = (short) (buf2b & 0xff);
+                            //Dividing amplitude by half and writing to temporary buffer.
+
+                            //Dividing amplitude by half and writing to temporary other buffer.
+                            short dudette = (short) (buf1b + buf2b);
+                            float fdudette = (float) (dudette / numberOfStreams);
+                            dudette = (short) fdudette;
+                            temporaryBufferWithAdjustedAmplitude[m] = (byte) dudette;
+                            temporaryBufferWithAdjustedAmplitude[m + 1] = (byte) (dudette >> 8);
+                            //Getting values from temporary buffer.
+
+                            //Getting values from temporary other buffer.
+                            buf1b = temporaryBufferWithAdjustedAmplitude[m + 1];
+                            buf2b = temporaryBufferWithAdjustedAmplitude[m];
+                            buf1b = (short) ((buf1b & 0xff) << 8);
+                            buf2b = (short) (buf2b & 0xff);
+                            //Adding buffers.
+                            short buf1c = (short) (buf1a + buf1b);
+                            short buf2c = (short) (buf2a + buf2b);
+                            short res = (short) (buf1c + buf2c);
+                            resultingBuffer[m] = (byte) res;
+                            resultingBuffer[m + 1] = (byte) (res >> 8);
+                            addCounter13 += 2;
+                            if (addCounter13 >= (data13.length - bufferLength)) {
+                                addCounter13 = 0;
+                            }
+                        }
+                        temp = resultingBuffer;
+                    }
+                }
+                if(addBuffer14)
+                {
+                    if(i==0)//actually should be 37220, but i is always a multiple of bufferlength, which is 100.Fun fact : there is an asteroid called 18610 ArthurDent.
+                    {
+                        Log.d(TAG,"Letting tracks in.");
+                        letIn14=true;
+                    }
+                    else if(!letIn14)
+                    {
+                        boolean lightOn=false;
+                        if(i%(bufferLength*100)==0)
+                        {
+                            if(lightOn)
+                            {
+                                //light off
+                                // ((ImageButton) findViewById(R.id.buttonEleven)).setImageDrawable(redButtonLightOff);
+                                //   setOff11();
+                                lightOn=false;
+                            }
+                            else if(!lightOn)
+                            {
+                                //  setOn11();
+                                //((ImageButton) findViewById(R.id.buttonEleven)).setImageDrawable(redButtonLightOn);
+                                lightOn=true;
+                                //light on.
+                            }
+                            Log.d(TAG,"GOOD BLINK RATE? ");
+                        }
+                        //Blink
+                    }
+                    if(letIn14) {
+                        byte[] subBuffer = Arrays.copyOfRange(data14, addCounter14, addCounter14 + bufferLength);
+                        byte[] temporaryBufferWithAdjustedAmplitude = new byte[bufferLength];
+                        for (int m = 0; m < subBuffer.length; m += 2) {
+                            short buf1a = temp[m + 1];
+                            short buf2a = temp[m];
+                            buf1a = (short) ((buf1a & 0xff) << 8);
+                            buf2a = (short) (buf2a & 0xff);
+                            short buf1b = subBuffer[m + 1];
+                            short buf2b = subBuffer[m];
+                            buf1b = (short) ((buf1b & 0xff) << 8);
+                            buf2b = (short) (buf2b & 0xff);
+                            //Dividing amplitude by half and writing to temporary buffer.
+
+                            //Dividing amplitude by half and writing to temporary other buffer.
+                            short dudette = (short) (buf1b + buf2b);
+                            float fdudette = (float) (dudette / numberOfStreams);
+                            dudette = (short) fdudette;
+                            temporaryBufferWithAdjustedAmplitude[m] = (byte) dudette;
+                            temporaryBufferWithAdjustedAmplitude[m + 1] = (byte) (dudette >> 8);
+                            //Getting values from temporary buffer.
+
+                            //Getting values from temporary other buffer.
+                            buf1b = temporaryBufferWithAdjustedAmplitude[m + 1];
+                            buf2b = temporaryBufferWithAdjustedAmplitude[m];
+                            buf1b = (short) ((buf1b & 0xff) << 8);
+                            buf2b = (short) (buf2b & 0xff);
+                            //Adding buffers.
+                            short buf1c = (short) (buf1a + buf1b);
+                            short buf2c = (short) (buf2a + buf2b);
+                            short res = (short) (buf1c + buf2c);
+                            resultingBuffer[m] = (byte) res;
+                            resultingBuffer[m + 1] = (byte) (res >> 8);
+                            addCounter14 += 2;
+                            if (addCounter14 >= (data14.length - bufferLength)) {
+                                addCounter14 = 0;
+                            }
+                        }
+                        temp = resultingBuffer;
+                    }
+                }
+                if(addBuffer15)
+                {
+                    if(i==0)//actually should be 37220, but i is always a multiple of bufferlength, which is 100.Fun fact : there is an asteroid called 18610 ArthurDent.
+                    {
+                        Log.d(TAG,"Letting tracks in.");
+                        letIn15=true;
+                    }
+                    else if(!letIn15)
+                    {
+                        boolean lightOn=false;
+                        if(i%(bufferLength*100)==0)
+                        {
+                            if(lightOn)
+                            {
+                                //light off
+                                // ((ImageButton) findViewById(R.id.buttonEleven)).setImageDrawable(redButtonLightOff);
+                                //   setOff11();
+                                lightOn=false;
+                            }
+                            else if(!lightOn)
+                            {
+                                //  setOn11();
+                                //((ImageButton) findViewById(R.id.buttonEleven)).setImageDrawable(redButtonLightOn);
+                                lightOn=true;
+                                //light on.
+                            }
+                            Log.d(TAG,"GOOD BLINK RATE? ");
+                        }
+                        //Blink
+                    }
+                    if(letIn15) {
+                        byte[] subBuffer = Arrays.copyOfRange(data15, addCounter15, addCounter15 + bufferLength);
+                        byte[] temporaryBufferWithAdjustedAmplitude = new byte[bufferLength];
+                        for (int m = 0; m < subBuffer.length; m += 2) {
+                            short buf1a = temp[m + 1];
+                            short buf2a = temp[m];
+                            buf1a = (short) ((buf1a & 0xff) << 8);
+                            buf2a = (short) (buf2a & 0xff);
+                            short buf1b = subBuffer[m + 1];
+                            short buf2b = subBuffer[m];
+                            buf1b = (short) ((buf1b & 0xff) << 8);
+                            buf2b = (short) (buf2b & 0xff);
+                            //Dividing amplitude by half and writing to temporary buffer.
+
+                            //Dividing amplitude by half and writing to temporary other buffer.
+                            short dudette = (short) (buf1b + buf2b);
+                            float fdudette = (float) (dudette / numberOfStreams);
+                            dudette = (short) fdudette;
+                            temporaryBufferWithAdjustedAmplitude[m] = (byte) dudette;
+                            temporaryBufferWithAdjustedAmplitude[m + 1] = (byte) (dudette >> 8);
+                            //Getting values from temporary buffer.
+
+                            //Getting values from temporary other buffer.
+                            buf1b = temporaryBufferWithAdjustedAmplitude[m + 1];
+                            buf2b = temporaryBufferWithAdjustedAmplitude[m];
+                            buf1b = (short) ((buf1b & 0xff) << 8);
+                            buf2b = (short) (buf2b & 0xff);
+                            //Adding buffers.
+                            short buf1c = (short) (buf1a + buf1b);
+                            short buf2c = (short) (buf2a + buf2b);
+                            short res = (short) (buf1c + buf2c);
+                            resultingBuffer[m] = (byte) res;
+                            resultingBuffer[m + 1] = (byte) (res >> 8);
+                            addCounter15 += 2;
+                            if (addCounter15 >= (data15.length - bufferLength)) {
+                                addCounter15 = 0;
+                            }
+                        }
+                        temp = resultingBuffer;
+                    }
+                }
+                if(addBuffer16)
+                {
+                    if(i==0)//actually should be 37220, but i is always a multiple of bufferlength, which is 100.Fun fact : there is an asteroid called 18610 ArthurDent.
+                    {
+                        Log.d(TAG,"Letting tracks in.");
+                        letIn16=true;
+                    }
+                    else if(!letIn16)
+                    {
+                        boolean lightOn=false;
+                        if(i%(bufferLength*100)==0)
+                        {
+                            if(lightOn)
+                            {
+                                //light off
+                                // ((ImageButton) findViewById(R.id.buttonEleven)).setImageDrawable(redButtonLightOff);
+                                //   setOff11();
+                                lightOn=false;
+                            }
+                            else if(!lightOn)
+                            {
+                                //  setOn11();
+                                //((ImageButton) findViewById(R.id.buttonEleven)).setImageDrawable(redButtonLightOn);
+                                lightOn=true;
+                                //light on.
+                            }
+                            Log.d(TAG,"GOOD BLINK RATE? ");
+                        }
+                        //Blink
+                    }
+                    if(letIn16) {
+                        byte[] subBuffer = Arrays.copyOfRange(data16, addCounter16, addCounter16 + bufferLength);
+                        byte[] temporaryBufferWithAdjustedAmplitude = new byte[bufferLength];
+                        for (int m = 0; m < subBuffer.length; m += 2) {
+                            short buf1a = temp[m + 1];
+                            short buf2a = temp[m];
+                            buf1a = (short) ((buf1a & 0xff) << 8);
+                            buf2a = (short) (buf2a & 0xff);
+                            short buf1b = subBuffer[m + 1];
+                            short buf2b = subBuffer[m];
+                            buf1b = (short) ((buf1b & 0xff) << 8);
+                            buf2b = (short) (buf2b & 0xff);
+                            //Dividing amplitude by half and writing to temporary buffer.
+
+                            //Dividing amplitude by half and writing to temporary other buffer.
+                            short dudette = (short) (buf1b + buf2b);
+                            float fdudette = (float) (dudette / numberOfStreams);
+                            dudette = (short) fdudette;
+                            temporaryBufferWithAdjustedAmplitude[m] = (byte) dudette;
+                            temporaryBufferWithAdjustedAmplitude[m + 1] = (byte) (dudette >> 8);
+                            //Getting values from temporary buffer.
+
+                            //Getting values from temporary other buffer.
+                            buf1b = temporaryBufferWithAdjustedAmplitude[m + 1];
+                            buf2b = temporaryBufferWithAdjustedAmplitude[m];
+                            buf1b = (short) ((buf1b & 0xff) << 8);
+                            buf2b = (short) (buf2b & 0xff);
+                            //Adding buffers.
+                            short buf1c = (short) (buf1a + buf1b);
+                            short buf2c = (short) (buf2a + buf2b);
+                            short res = (short) (buf1c + buf2c);
+                            resultingBuffer[m] = (byte) res;
+                            resultingBuffer[m + 1] = (byte) (res >> 8);
+                            addCounter16 += 2;
+                            if (addCounter16 >= (data16.length - bufferLength)) {
+                                addCounter16 = 0;
+                            }
+                        }
+                        temp = resultingBuffer;
+                    }
+                }
                 if(addBuffer17) {
                     Log.d(TAG,"This is length of byte array for data17: "+data17+"");
                     byte[] subBuffer = Arrays.copyOfRange(data17, addCounter17, addCounter17 + bufferLength);
+                    byte[] temporaryBufferWithAdjustedAmplitude = new byte[bufferLength];
+                    for (int m = 0; m < subBuffer.length; m += 2) {
+                        short buf1a = temp[m + 1];
+                        short buf2a = temp[m];
+                        buf1a = (short) ((buf1a & 0xff) << 8);
+                        buf2a = (short) (buf2a & 0xff);
+                        short buf1b = subBuffer[m + 1];
+                        short buf2b = subBuffer[m];
+                        buf1b = (short) ((buf1b & 0xff) << 8);
+                        buf2b = (short) (buf2b & 0xff);
+                        //Dividing amplitude by half and writing to temporary buffer.
+                        //Dividing amplitude by half and writing to temporary other buffer.
+                        short dudette = (short) (buf1b + buf2b);
+                        float fdudette = (float) (dudette / numberOfStreams);
+                        dudette = (short) fdudette;
+                        temporaryBufferWithAdjustedAmplitude[m] = (byte) dudette;
+                        temporaryBufferWithAdjustedAmplitude[m + 1] = (byte) (dudette >> 8);
+                        //Getting values from temporary buffer.
+
+                        //Getting values from temporary other buffer.
+                        buf1b = temporaryBufferWithAdjustedAmplitude[m + 1];
+                        buf2b = temporaryBufferWithAdjustedAmplitude[m];
+                        buf1b = (short) ((buf1b & 0xff) << 8);
+                        buf2b = (short) (buf2b & 0xff);
+                        //Adding buffers.
+                        short buf1c = (short) (buf1a + buf1b);
+                        short buf2c = (short) (buf2a + buf2b);
+                        short res = (short) (buf1c + buf2c);
+                        resultingBuffer[m] = (byte) res;
+                        resultingBuffer[m + 1] = (byte) (res >> 8);
+                        addCounter17 += 2;
+                        if (addCounter17 >= (data17.length - bufferLength))
+                        {
+                            addCounter17 = 0;
+                            addBuffer17=false;
+                            numberOfStreams--;
+                            if(numberOfStreams==0)
+                            {
+                                stopStream=true;
+                            }
+                        }
+                    }
+                    temp = resultingBuffer;
+                }
+                if(addBuffer18) {
+                    Log.d(TAG,"This is length of byte array for data17: "+data17+"");
+                    byte[] subBuffer = Arrays.copyOfRange(data18, addCounter18, addCounter18 + bufferLength);
                     byte[] temporaryBufferWithAdjustedAmplitude = new byte[bufferLength];
                     for (int m = 0; m < subBuffer.length; m += 2) {
                         short buf1a = temp[m + 1];
@@ -1158,11 +1581,299 @@ public class MainActivity extends Activity {
                         short res = (short) (buf1c + buf2c);
                         resultingBuffer[m] = (byte) res;
                         resultingBuffer[m + 1] = (byte) (res >> 8);
-                        addCounter17 += 2;
-                        if (addCounter17 >= (data17.length - bufferLength))
+                        addCounter18 += 2;
+                        if (addCounter18 >= (data18.length - bufferLength))
                         {
-                            addCounter17 = 0;
-                            addBuffer17=false;
+                            addCounter18 = 0;
+                            addBuffer18=false;
+                            numberOfStreams--;
+                            if(numberOfStreams==0)
+                            {
+                                stopStream=true;
+                            }
+                        }
+                    }
+                    temp = resultingBuffer;
+                }
+                if(addBuffer19) {
+                    Log.d(TAG,"This is length of byte array for data17: "+data17+"");
+                    byte[] subBuffer = Arrays.copyOfRange(data19, addCounter19, addCounter19 + bufferLength);
+                    byte[] temporaryBufferWithAdjustedAmplitude = new byte[bufferLength];
+                    for (int m = 0; m < subBuffer.length; m += 2) {
+                        short buf1a = temp[m + 1];
+                        short buf2a = temp[m];
+                        buf1a = (short) ((buf1a & 0xff) << 8);
+                        buf2a = (short) (buf2a & 0xff);
+                        short buf1b = subBuffer[m + 1];
+                        short buf2b = subBuffer[m];
+                        buf1b = (short) ((buf1b & 0xff) << 8);
+                        buf2b = (short) (buf2b & 0xff);
+                        //Dividing amplitude by half and writing to temporary buffer.
+
+                        //Dividing amplitude by half and writing to temporary other buffer.
+                        short dudette = (short) (buf1b + buf2b);
+                        float fdudette = (float) (dudette / numberOfStreams);
+                        dudette = (short) fdudette;
+                        temporaryBufferWithAdjustedAmplitude[m] = (byte) dudette;
+                        temporaryBufferWithAdjustedAmplitude[m + 1] = (byte) (dudette >> 8);
+                        //Getting values from temporary buffer.
+
+                        //Getting values from temporary other buffer.
+                        buf1b = temporaryBufferWithAdjustedAmplitude[m + 1];
+                        buf2b = temporaryBufferWithAdjustedAmplitude[m];
+                        buf1b = (short) ((buf1b & 0xff) << 8);
+                        buf2b = (short) (buf2b & 0xff);
+                        //Adding buffers.
+                        short buf1c = (short) (buf1a + buf1b);
+                        short buf2c = (short) (buf2a + buf2b);
+                        short res = (short) (buf1c + buf2c);
+                        resultingBuffer[m] = (byte) res;
+                        resultingBuffer[m + 1] = (byte) (res >> 8);
+                        addCounter19 += 2;
+                        if (addCounter19 >= (data19.length - bufferLength))
+                        {
+                            addCounter19 = 0;
+                            addBuffer19=false;
+                            numberOfStreams--;
+                            if(numberOfStreams==0)
+                            {
+                                stopStream=true;
+                            }
+                        }
+                    }
+                    temp = resultingBuffer;
+                }
+                if(addBuffer20) {
+                    Log.d(TAG,"This is length of byte array for data17: "+data17+"");
+                    byte[] subBuffer = Arrays.copyOfRange(data20, addCounter20, addCounter20 + bufferLength);
+                    byte[] temporaryBufferWithAdjustedAmplitude = new byte[bufferLength];
+                    for (int m = 0; m < subBuffer.length; m += 2) {
+                        short buf1a = temp[m + 1];
+                        short buf2a = temp[m];
+                        buf1a = (short) ((buf1a & 0xff) << 8);
+                        buf2a = (short) (buf2a & 0xff);
+                        short buf1b = subBuffer[m + 1];
+                        short buf2b = subBuffer[m];
+                        buf1b = (short) ((buf1b & 0xff) << 8);
+                        buf2b = (short) (buf2b & 0xff);
+                        //Dividing amplitude by half and writing to temporary buffer.
+
+                        //Dividing amplitude by half and writing to temporary other buffer.
+                        short dudette = (short) (buf1b + buf2b);
+                        float fdudette = (float) (dudette / numberOfStreams);
+                        dudette = (short) fdudette;
+                        temporaryBufferWithAdjustedAmplitude[m] = (byte) dudette;
+                        temporaryBufferWithAdjustedAmplitude[m + 1] = (byte) (dudette >> 8);
+                        //Getting values from temporary buffer.
+
+                        //Getting values from temporary other buffer.
+                        buf1b = temporaryBufferWithAdjustedAmplitude[m + 1];
+                        buf2b = temporaryBufferWithAdjustedAmplitude[m];
+                        buf1b = (short) ((buf1b & 0xff) << 8);
+                        buf2b = (short) (buf2b & 0xff);
+                        //Adding buffers.
+                        short buf1c = (short) (buf1a + buf1b);
+                        short buf2c = (short) (buf2a + buf2b);
+                        short res = (short) (buf1c + buf2c);
+                        resultingBuffer[m] = (byte) res;
+                        resultingBuffer[m + 1] = (byte) (res >> 8);
+                        addCounter20 += 2;
+                        if (addCounter20 >= (data20.length - bufferLength))
+                        {
+                            addCounter20 = 0;
+                            addBuffer20=false;
+                            numberOfStreams--;
+                            if(numberOfStreams==0)
+                            {
+                                stopStream=true;
+                            }
+                        }
+                    }
+                    temp = resultingBuffer;
+                }
+                if(addBuffer21) {
+                    Log.d(TAG,"This is length of byte array for data17: "+data17+"");
+                    byte[] subBuffer = Arrays.copyOfRange(data21, addCounter21, addCounter21 + bufferLength);
+                    byte[] temporaryBufferWithAdjustedAmplitude = new byte[bufferLength];
+                    for (int m = 0; m < subBuffer.length; m += 2) {
+                        short buf1a = temp[m + 1];
+                        short buf2a = temp[m];
+                        buf1a = (short) ((buf1a & 0xff) << 8);
+                        buf2a = (short) (buf2a & 0xff);
+                        short buf1b = subBuffer[m + 1];
+                        short buf2b = subBuffer[m];
+                        buf1b = (short) ((buf1b & 0xff) << 8);
+                        buf2b = (short) (buf2b & 0xff);
+                        //Dividing amplitude by half and writing to temporary buffer.
+
+                        //Dividing amplitude by half and writing to temporary other buffer.
+                        short dudette = (short) (buf1b + buf2b);
+                        float fdudette = (float) (dudette / numberOfStreams);
+                        dudette = (short) fdudette;
+                        temporaryBufferWithAdjustedAmplitude[m] = (byte) dudette;
+                        temporaryBufferWithAdjustedAmplitude[m + 1] = (byte) (dudette >> 8);
+                        //Getting values from temporary buffer.
+
+                        //Getting values from temporary other buffer.
+                        buf1b = temporaryBufferWithAdjustedAmplitude[m + 1];
+                        buf2b = temporaryBufferWithAdjustedAmplitude[m];
+                        buf1b = (short) ((buf1b & 0xff) << 8);
+                        buf2b = (short) (buf2b & 0xff);
+                        //Adding buffers.
+                        short buf1c = (short) (buf1a + buf1b);
+                        short buf2c = (short) (buf2a + buf2b);
+                        short res = (short) (buf1c + buf2c);
+                        resultingBuffer[m] = (byte) res;
+                        resultingBuffer[m + 1] = (byte) (res >> 8);
+                        addCounter21 += 2;
+                        if (addCounter21 >= (data21.length - bufferLength))
+                        {
+                            addCounter21 = 0;
+                            addBuffer21=false;
+                            numberOfStreams--;
+                            if(numberOfStreams==0)
+                            {
+                                stopStream=true;
+                            }
+                        }
+                    }
+                    temp = resultingBuffer;
+                }
+                if(addBuffer22) {
+                    Log.d(TAG,"This is length of byte array for data17: "+data17+"");
+                    byte[] subBuffer = Arrays.copyOfRange(data22, addCounter22, addCounter22 + bufferLength);
+                    byte[] temporaryBufferWithAdjustedAmplitude = new byte[bufferLength];
+                    for (int m = 0; m < subBuffer.length; m += 2) {
+                        short buf1a = temp[m + 1];
+                        short buf2a = temp[m];
+                        buf1a = (short) ((buf1a & 0xff) << 8);
+                        buf2a = (short) (buf2a & 0xff);
+                        short buf1b = subBuffer[m + 1];
+                        short buf2b = subBuffer[m];
+                        buf1b = (short) ((buf1b & 0xff) << 8);
+                        buf2b = (short) (buf2b & 0xff);
+                        //Dividing amplitude by half and writing to temporary buffer.
+
+                        //Dividing amplitude by half and writing to temporary other buffer.
+                        short dudette = (short) (buf1b + buf2b);
+                        float fdudette = (float) (dudette / numberOfStreams);
+                        dudette = (short) fdudette;
+                        temporaryBufferWithAdjustedAmplitude[m] = (byte) dudette;
+                        temporaryBufferWithAdjustedAmplitude[m + 1] = (byte) (dudette >> 8);
+                        //Getting values from temporary buffer.
+
+                        //Getting values from temporary other buffer.
+                        buf1b = temporaryBufferWithAdjustedAmplitude[m + 1];
+                        buf2b = temporaryBufferWithAdjustedAmplitude[m];
+                        buf1b = (short) ((buf1b & 0xff) << 8);
+                        buf2b = (short) (buf2b & 0xff);
+                        //Adding buffers.
+                        short buf1c = (short) (buf1a + buf1b);
+                        short buf2c = (short) (buf2a + buf2b);
+                        short res = (short) (buf1c + buf2c);
+                        resultingBuffer[m] = (byte) res;
+                        resultingBuffer[m + 1] = (byte) (res >> 8);
+                        addCounter22 += 2;
+                        if (addCounter22 >= (data22.length - bufferLength))
+                        {
+                            addCounter22 = 0;
+                            addBuffer22=false;
+                            numberOfStreams--;
+                            if(numberOfStreams==0)
+                            {
+                                stopStream=true;
+                            }
+                        }
+                    }
+                    temp = resultingBuffer;
+                }
+                if(addBuffer23) {
+                    Log.d(TAG,"This is length of byte array for data17: "+data17+"");
+                    byte[] subBuffer = Arrays.copyOfRange(data23, addCounter23, addCounter23 + bufferLength);
+                    byte[] temporaryBufferWithAdjustedAmplitude = new byte[bufferLength];
+                    for (int m = 0; m < subBuffer.length; m += 2) {
+                        short buf1a = temp[m + 1];
+                        short buf2a = temp[m];
+                        buf1a = (short) ((buf1a & 0xff) << 8);
+                        buf2a = (short) (buf2a & 0xff);
+                        short buf1b = subBuffer[m + 1];
+                        short buf2b = subBuffer[m];
+                        buf1b = (short) ((buf1b & 0xff) << 8);
+                        buf2b = (short) (buf2b & 0xff);
+                        //Dividing amplitude by half and writing to temporary buffer.
+
+                        //Dividing amplitude by half and writing to temporary other buffer.
+                        short dudette = (short) (buf1b + buf2b);
+                        float fdudette = (float) (dudette / numberOfStreams);
+                        dudette = (short) fdudette;
+                        temporaryBufferWithAdjustedAmplitude[m] = (byte) dudette;
+                        temporaryBufferWithAdjustedAmplitude[m + 1] = (byte) (dudette >> 8);
+                        //Getting values from temporary buffer.
+
+                        //Getting values from temporary other buffer.
+                        buf1b = temporaryBufferWithAdjustedAmplitude[m + 1];
+                        buf2b = temporaryBufferWithAdjustedAmplitude[m];
+                        buf1b = (short) ((buf1b & 0xff) << 8);
+                        buf2b = (short) (buf2b & 0xff);
+                        //Adding buffers.
+                        short buf1c = (short) (buf1a + buf1b);
+                        short buf2c = (short) (buf2a + buf2b);
+                        short res = (short) (buf1c + buf2c);
+                        resultingBuffer[m] = (byte) res;
+                        resultingBuffer[m + 1] = (byte) (res >> 8);
+                        addCounter23 += 2;
+                        if (addCounter23 >= (data23.length - bufferLength))
+                        {
+                            addCounter23 = 0;
+                            addBuffer23=false;
+                            numberOfStreams--;
+                            if(numberOfStreams==0)
+                            {
+                                stopStream=true;
+                            }
+                        }
+                    }
+                    temp = resultingBuffer;
+                }
+                if(addBuffer24) {
+                    Log.d(TAG,"This is length of byte array for data17: "+data17+"");
+                    byte[] subBuffer = Arrays.copyOfRange(data24, addCounter24, addCounter24 + bufferLength);
+                    byte[] temporaryBufferWithAdjustedAmplitude = new byte[bufferLength];
+                    for (int m = 0; m < subBuffer.length; m += 2) {
+                        short buf1a = temp[m + 1];
+                        short buf2a = temp[m];
+                        buf1a = (short) ((buf1a & 0xff) << 8);
+                        buf2a = (short) (buf2a & 0xff);
+                        short buf1b = subBuffer[m + 1];
+                        short buf2b = subBuffer[m];
+                        buf1b = (short) ((buf1b & 0xff) << 8);
+                        buf2b = (short) (buf2b & 0xff);
+                        //Dividing amplitude by half and writing to temporary buffer.
+
+                        //Dividing amplitude by half and writing to temporary other buffer.
+                        short dudette = (short) (buf1b + buf2b);
+                        float fdudette = (float) (dudette / numberOfStreams);
+                        dudette = (short) fdudette;
+                        temporaryBufferWithAdjustedAmplitude[m] = (byte) dudette;
+                        temporaryBufferWithAdjustedAmplitude[m + 1] = (byte) (dudette >> 8);
+                        //Getting values from temporary buffer.
+
+                        //Getting values from temporary other buffer.
+                        buf1b = temporaryBufferWithAdjustedAmplitude[m + 1];
+                        buf2b = temporaryBufferWithAdjustedAmplitude[m];
+                        buf1b = (short) ((buf1b & 0xff) << 8);
+                        buf2b = (short) (buf2b & 0xff);
+                        //Adding buffers.
+                        short buf1c = (short) (buf1a + buf1b);
+                        short buf2c = (short) (buf2a + buf2b);
+                        short res = (short) (buf1c + buf2c);
+                        resultingBuffer[m] = (byte) res;
+                        resultingBuffer[m + 1] = (byte) (res >> 8);
+                        addCounter24 += 2;
+                        if (addCounter24 >= (data24.length - bufferLength))
+                        {
+                            addCounter24 = 0;
+                            addBuffer24=false;
                             numberOfStreams--;
                             if(numberOfStreams==0)
                             {
@@ -1206,13 +1917,14 @@ public class MainActivity extends Activity {
         super.onCreate(savedInstanceState);
 
         setContentView(R.layout.activity_main4);
+
         try
         {
             fillAllBuffers();//Load data7, data8, data9.
            // bufferLength=data7.length;
         }
         catch (Exception e){}
-        //Start: applies to activit_main3.xml
+        //Start: applies to activity_main3.xml
 
         b1 = (ImageButton) findViewById(R.id.buttonOne);
         b2 = (ImageButton) findViewById(R.id.buttonTwo);
@@ -1249,9 +1961,13 @@ public class MainActivity extends Activity {
         getWindowManager().getDefaultDisplay().getMetrics(metrics);
         int width=metrics.widthPixels;
         int height=metrics.heightPixels;
+        //Get banner dimensions (50x320dp) in pixels:
+        int bannerHeightInPixels = (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, 50, getResources().getDisplayMetrics());
+        int bannerWidthInPixels = (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, 320, getResources().getDisplayMetrics());
+
         LinearLayout.LayoutParams layoutparams;
         int squareSide=0;
-        if((width/4)<(height/6))
+        if((width/4)<(height-bannerHeightInPixels)/6)
         {
             //Side in pixels:
             squareSide=width/4;
@@ -1260,7 +1976,7 @@ public class MainActivity extends Activity {
         else
         {
             //Side in pixels:
-            squareSide=height/4;
+            squareSide=(height-bannerHeightInPixels)/6;
         }
         b1.setLayoutParams(new LinearLayout.LayoutParams(squareSide,squareSide));
         b2.setLayoutParams(new LinearLayout.LayoutParams(squareSide,squareSide));
@@ -1297,6 +2013,12 @@ public class MainActivity extends Activity {
         final Animation animation9 = new AlphaAnimation(1,0);
         final Animation animation10 = new AlphaAnimation(1,0);
         final Animation animation11 = new AlphaAnimation(1,0);
+        final Animation animation12 = new AlphaAnimation(1,0);
+        final Animation animation13 = new AlphaAnimation(1,0);
+        final Animation animation14 = new AlphaAnimation(1,0);
+        final Animation animation15 = new AlphaAnimation(1,0);
+        final Animation animation16 = new AlphaAnimation(1,0);
+
 
         int blinkDuration = 500;
         animation1.setDuration(blinkDuration);
@@ -1310,6 +2032,11 @@ public class MainActivity extends Activity {
         animation9.setDuration(blinkDuration);
         animation10.setDuration(blinkDuration);
         animation11.setDuration(blinkDuration);
+        animation12.setDuration(blinkDuration);
+        animation13.setDuration(blinkDuration);
+        animation14.setDuration(blinkDuration);
+        animation15.setDuration(blinkDuration);
+        animation16.setDuration(blinkDuration);
 
         animation1.setInterpolator(new LinearInterpolator());
         animation1.setRepeatMode(Animation.REVERSE);
@@ -1333,9 +2060,16 @@ public class MainActivity extends Activity {
         animation10.setRepeatMode(Animation.REVERSE);
         animation11.setInterpolator(new LinearInterpolator());
         animation11.setRepeatMode(Animation.REVERSE);
-
-
-
+        animation12.setInterpolator(new LinearInterpolator());
+        animation12.setRepeatMode(Animation.REVERSE);
+        animation13.setInterpolator(new LinearInterpolator());
+        animation13.setRepeatMode(Animation.REVERSE);
+        animation14.setInterpolator(new LinearInterpolator());
+        animation14.setRepeatMode(Animation.REVERSE);
+        animation15.setInterpolator(new LinearInterpolator());
+        animation15.setRepeatMode(Animation.REVERSE);
+        animation16.setInterpolator(new LinearInterpolator());
+        animation16.setRepeatMode(Animation.REVERSE);
 
         b1.setOnClickListener(new View.OnClickListener() {
             public void onClick(View v) {
@@ -1531,7 +2265,7 @@ public class MainActivity extends Activity {
                                 b4.startAnimation(animation4);
                             }
                         }
-                        ((ImageButton) findViewById(R.id.buttonFour)).setImageDrawable(yellowButtonLightOn);
+                        ((ImageButton) findViewById(R.id.buttonFour)).setImageDrawable(greenButtonLightOn);
                     }
                     else if(addBuffer4)
                     {
@@ -1548,7 +2282,7 @@ public class MainActivity extends Activity {
                         {
                             stopStream=true;
                         }
-                        ((ImageButton) findViewById(R.id.buttonFour)).setImageDrawable(yellowButtonLightOff);
+                        ((ImageButton) findViewById(R.id.buttonFour)).setImageDrawable(greenButtonLightOff);
                     }
                     //final CharSequence text = "Testing 1 2 3";
                     //Toast toast = Toast.makeText(getApplicationContext(),text,Toast.LENGTH_LONG);
@@ -1584,7 +2318,7 @@ public class MainActivity extends Activity {
                                 b5.startAnimation(animation5);
                             }
                         }
-                        ((ImageButton) findViewById(R.id.buttonFive)).setImageDrawable(yellowButtonLightOn);
+                        ((ImageButton) findViewById(R.id.buttonFive)).setImageDrawable(greenButtonLightOn);
                     }
                     else if(addBuffer5)
                     {
@@ -1600,7 +2334,7 @@ public class MainActivity extends Activity {
                         {
                             stopStream=true;
                         }
-                        ((ImageButton) findViewById(R.id.buttonFive)).setImageDrawable(yellowButtonLightOff);
+                        ((ImageButton) findViewById(R.id.buttonFive)).setImageDrawable(greenButtonLightOff);
                     }
                     //final CharSequence text = "Testing 1 2 3";
                     //Toast toast = Toast.makeText(getApplicationContext(),text,Toast.LENGTH_LONG);
@@ -1637,7 +2371,7 @@ public class MainActivity extends Activity {
                                 b6.startAnimation(animation6);
                             }
                         }
-                        ((ImageButton) findViewById(R.id.buttonSix)).setImageDrawable(yellowButtonLightOn);
+                        ((ImageButton) findViewById(R.id.buttonSix)).setImageDrawable(greenButtonLightOn);
                     }
                     else if(addBuffer6)
                     {
@@ -1654,7 +2388,7 @@ public class MainActivity extends Activity {
                         {
                             stopStream=true;
                         }
-                        ((ImageButton) findViewById(R.id.buttonSix)).setImageDrawable(yellowButtonLightOff);
+                        ((ImageButton) findViewById(R.id.buttonSix)).setImageDrawable(greenButtonLightOff);
                     }
                     //final CharSequence text = "Testing 1 2 3";
                     //Toast toast = Toast.makeText(getApplicationContext(),text,Toast.LENGTH_LONG);
@@ -1693,7 +2427,7 @@ public class MainActivity extends Activity {
                                 b7.startAnimation(animation7);
                             }
                         }
-                        ((ImageButton) findViewById(R.id.buttonSeven)).setImageDrawable(redButtonLightOn);
+                        ((ImageButton) findViewById(R.id.buttonSeven)).setImageDrawable(yellowButtonLightOn);
                     }
                     else if(addBuffer7)
                     {
@@ -1710,7 +2444,7 @@ public class MainActivity extends Activity {
                         {
                             stopStream=true;
                         }
-                        ((ImageButton) findViewById(R.id.buttonSeven)).setImageDrawable(redButtonLightOff);
+                        ((ImageButton) findViewById(R.id.buttonSeven)).setImageDrawable(yellowButtonLightOff);
                     }
                     //final CharSequence text = "Testing 1 2 3";
                     //Toast toast = Toast.makeText(getApplicationContext(),text,Toast.LENGTH_LONG);
@@ -1747,7 +2481,7 @@ public class MainActivity extends Activity {
                                 b8.startAnimation(animation8);
                             }
                         }
-                        ((ImageButton) findViewById(R.id.buttonEight)).setImageDrawable(redButtonLightOn);
+                        ((ImageButton) findViewById(R.id.buttonEight)).setImageDrawable(yellowButtonLightOn);
                     }
                     else if(addBuffer8)
                     {
@@ -1763,7 +2497,7 @@ public class MainActivity extends Activity {
                         {
                             stopStream=true;
                         }
-                        ((ImageButton) findViewById(R.id.buttonEight)).setImageDrawable(redButtonLightOff);
+                        ((ImageButton) findViewById(R.id.buttonEight)).setImageDrawable(yellowButtonLightOff);
                     }
                     //final CharSequence text = "Testing 1 2 3";
                     //Toast toast = Toast.makeText(getApplicationContext(),text,Toast.LENGTH_LONG);
@@ -1800,7 +2534,7 @@ public class MainActivity extends Activity {
                                 b9.startAnimation(animation9);
                             }
                         }
-                        ((ImageButton) findViewById(R.id.buttonNine)).setImageDrawable(redButtonLightOn);
+                        ((ImageButton) findViewById(R.id.buttonNine)).setImageDrawable(yellowButtonLightOn);
                     }
                     else if(addBuffer9)
                     {
@@ -1816,7 +2550,7 @@ public class MainActivity extends Activity {
                         {
                             stopStream=true;
                         }
-                        ((ImageButton) findViewById(R.id.buttonNine)).setImageDrawable(redButtonLightOff);
+                        ((ImageButton) findViewById(R.id.buttonNine)).setImageDrawable(yellowButtonLightOff);
                     }
                 } catch (Exception e) {
                     throw new RuntimeException(e);
@@ -1937,27 +2671,49 @@ public class MainActivity extends Activity {
                 try {
                     if(!addBuffer12)
                     {
-                        /*
                         if (numberOfStreams == 0) {
+                            Log.d(TAG,"Added number 12 to stream.");
+                            stopStream=false;
                             numberOfStreams += 1.0;
+                            addBuffer12 = true;
                             startStreaming();
                         } else {
                             numberOfStreams += 1.0;
-                        }*/
-                        addBuffer12=true;
+                            addBuffer12 = true;
+                            //Get i, compare to bufferlength. determine how many i's is a second. set duration accordingly.
+                            Log.d(TAG,"Clicked b12, this is i: "+i);
+                            Log.d(TAG,"Clicked b12, this is outputbuffer length: "+outputBuffer.length);
+                            Log.d(TAG,"Expected value: about 320000");
+                            int m = outputBuffer.length-i;
+                            int blinkDuration=500;
+                            long timeInMilliSecondsLeft = m*1000/88200;
+                            long repeatTimes = timeInMilliSecondsLeft/blinkDuration;
+                            Log.d(TAG,"Time in milliseconds left: "+timeInMilliSecondsLeft);
+                            Log.d(TAG,"Repeat this many times: "+repeatTimes);
+                            int thisManyTimes=(int)repeatTimes-1;
+                            if(thisManyTimes!=-1)
+                            {
+                                animation12.setRepeatCount((int) thisManyTimes);
+                                b12.startAnimation(animation12);
+                            }
+                        }
                         ((ImageButton) findViewById(R.id.buttonTwelve)).setImageDrawable(purpleButtonLightOn);
                     }
                     else if(addBuffer12)
                     {
+                        if(!letIn12)
+                        {
+                            b12.clearAnimation();
+                        }
                         addBuffer12=false;
-                        /*numberOfStreams-=1.0;
+                        numberOfStreams-=1.0;
                         addCounter12=0;
                         letIn12=false;
 
                         if(numberOfStreams==0)
                         {
-                            stopStreaming();
-                        }*/
+                            stopStream=true;
+                        }
                         ((ImageButton) findViewById(R.id.buttonTwelve)).setImageDrawable(purpleButtonLightOff);
                     }
                 } catch (Exception e) {
@@ -1970,27 +2726,47 @@ public class MainActivity extends Activity {
                 try {
                     if(!addBuffer13)
                     {
-                        /*
                         if (numberOfStreams == 0) {
+                            stopStream=false;
                             numberOfStreams += 1.0;
+                            addBuffer13 = true;
                             startStreaming();
                         } else {
                             numberOfStreams += 1.0;
-                        }*/
-                        addBuffer13=true;
+                            addBuffer13 = true;
+                            //Get i, compare to bufferlength. determine how many i's is a second. set duration accordingly.
+                            Log.d(TAG,"Clicked b11, this is i: "+i);
+                            Log.d(TAG,"Clicked b11, this is outputbuffer length: "+outputBuffer.length);
+                            Log.d(TAG,"Expected value: about 320000");
+                            int m = outputBuffer.length-i;
+                            int blinkDuration=500;
+                            long timeInMilliSecondsLeft = m*1000/88200;
+                            long repeatTimes = timeInMilliSecondsLeft/blinkDuration;
+                            Log.d(TAG,"Time in milliseconds left: "+timeInMilliSecondsLeft);
+                            Log.d(TAG,"Repeat this many times: "+repeatTimes);
+                            int thisManyTimes=(int)repeatTimes-1;
+                            if(thisManyTimes!=-1)
+                            {
+                                animation13.setRepeatCount((int) thisManyTimes);
+                                b13.startAnimation(animation13);
+                            }
+                        }
                         ((ImageButton) findViewById(R.id.buttonThirteen)).setImageDrawable(purpleButtonLightOn);
                     }
                     else if(addBuffer13)
                     {
+                        if(!letIn13)
+                        {
+                            b13.clearAnimation();
+                        }
                         addBuffer13=false;
-                        /*numberOfStreams-=1.0;
-                        addCounter12=0;
-                        letIn12=false;
-
+                        numberOfStreams-=1.0;
+                        addCounter13=0;
+                        letIn13=false;
                         if(numberOfStreams==0)
                         {
-                            stopStreaming();
-                        }*/
+                            stopStream=true;
+                        }
                         ((ImageButton) findViewById(R.id.buttonThirteen)).setImageDrawable(purpleButtonLightOff);
                     }
                 } catch (Exception e) {
@@ -2003,27 +2779,48 @@ public class MainActivity extends Activity {
                 try {
                     if(!addBuffer14)
                     {
-                        /*
                         if (numberOfStreams == 0) {
+                            stopStream=false;
                             numberOfStreams += 1.0;
+                            addBuffer14 = true;
                             startStreaming();
                         } else {
                             numberOfStreams += 1.0;
-                        }*/
-                        addBuffer14=true;
+                            addBuffer14 = true;
+                            //Get i, compare to bufferlength. determine how many i's is a second. set duration accordingly.
+                            Log.d(TAG,"Clicked b11, this is i: "+i);
+                            Log.d(TAG,"Clicked b11, this is outputbuffer length: "+outputBuffer.length);
+                            Log.d(TAG,"Expected value: about 320000");
+                            int m = outputBuffer.length-i;
+                            int blinkDuration=500;
+                            long timeInMilliSecondsLeft = m*1000/88200;
+                            long repeatTimes = timeInMilliSecondsLeft/blinkDuration;
+                            Log.d(TAG,"Time in milliseconds left: "+timeInMilliSecondsLeft);
+                            Log.d(TAG,"Repeat this many times: "+repeatTimes);
+                            int thisManyTimes=(int)repeatTimes-1;
+                            if(thisManyTimes!=-1)
+                            {
+                                animation14.setRepeatCount((int) thisManyTimes);
+                                b14.startAnimation(animation14);
+                            }
+                        }
                         ((ImageButton) findViewById(R.id.buttonFourteen)).setImageDrawable(purpleButtonLightOn);
                     }
                     else if(addBuffer14)
                     {
+                        if(!letIn14)
+                        {
+                            b14.clearAnimation();
+                        }
                         addBuffer14=false;
-                        /*numberOfStreams-=1.0;
-                        addCounter12=0;
-                        letIn12=false;
+                        numberOfStreams-=1.0;
+                        addCounter14=0;
+                        letIn14=false;
 
                         if(numberOfStreams==0)
                         {
-                            stopStreaming();
-                        }*/
+                            stopStream=true;
+                        }
                         ((ImageButton) findViewById(R.id.buttonFourteen)).setImageDrawable(purpleButtonLightOff);
                     }
                 } catch (Exception e) {
@@ -2036,27 +2833,48 @@ public class MainActivity extends Activity {
                 try {
                     if(!addBuffer15)
                     {
-                        /*
                         if (numberOfStreams == 0) {
+                            stopStream=false;
                             numberOfStreams += 1.0;
+                            addBuffer15 = true;
                             startStreaming();
                         } else {
                             numberOfStreams += 1.0;
-                        }*/
-                        addBuffer15=true;
+                            addBuffer15 = true;
+                            //Get i, compare to bufferlength. determine how many i's is a second. set duration accordingly.
+                            Log.d(TAG,"Clicked b11, this is i: "+i);
+                            Log.d(TAG,"Clicked b11, this is outputbuffer length: "+outputBuffer.length);
+                            Log.d(TAG,"Expected value: about 320000");
+                            int m = outputBuffer.length-i;
+                            int blinkDuration=500;
+                            long timeInMilliSecondsLeft = m*1000/88200;
+                            long repeatTimes = timeInMilliSecondsLeft/blinkDuration;
+                            Log.d(TAG,"Time in milliseconds left: "+timeInMilliSecondsLeft);
+                            Log.d(TAG,"Repeat this many times: "+repeatTimes);
+                            int thisManyTimes=(int)repeatTimes-1;
+                            if(thisManyTimes!=-1)
+                            {
+                                animation15.setRepeatCount((int) thisManyTimes);
+                                b15.startAnimation(animation15);
+                            }
+                        }
                         ((ImageButton) findViewById(R.id.buttonFifteen)).setImageDrawable(purpleButtonLightOn);
                     }
                     else if(addBuffer15)
                     {
+                        if(!letIn15)
+                        {
+                            b15.clearAnimation();
+                        }
                         addBuffer15=false;
-                        /*numberOfStreams-=1.0;
-                        addCounter12=0;
-                        letIn12=false;
+                        numberOfStreams-=1.0;
+                        addCounter15=0;
+                        letIn15=false;
 
                         if(numberOfStreams==0)
                         {
-                            stopStreaming();
-                        }*/
+                            stopStream=true;
+                        }
                         ((ImageButton) findViewById(R.id.buttonFifteen)).setImageDrawable(purpleButtonLightOff);
                     }
                 } catch (Exception e) {
@@ -2069,27 +2887,51 @@ public class MainActivity extends Activity {
                 try {
                     if(!addBuffer16)
                     {
-                        /*
-                        if (numberOfStreams == 0) {
+                        if (numberOfStreams == 0)
+                        {
+                            stopStream=false;
                             numberOfStreams += 1.0;
+                            addBuffer16 = true;
                             startStreaming();
-                        } else {
+                        }
+                        else
+                        {
                             numberOfStreams += 1.0;
-                        }*/
-                        addBuffer16=true;
+                            addBuffer16 = true;
+                            //Get i, compare to bufferlength. determine how many i's is a second. set duration accordingly.
+                            Log.d(TAG,"Clicked b11, this is i: "+i);
+                            Log.d(TAG,"Clicked b11, this is outputbuffer length: "+outputBuffer.length);
+                            Log.d(TAG,"Expected value: about 320000");
+                            int m = outputBuffer.length-i;
+                            int blinkDuration=500;
+                            long timeInMilliSecondsLeft = m*1000/88200;
+                            long repeatTimes = timeInMilliSecondsLeft/blinkDuration;
+                            Log.d(TAG,"Time in milliseconds left: "+timeInMilliSecondsLeft);
+                            Log.d(TAG,"Repeat this many times: "+repeatTimes);
+                            int thisManyTimes=(int)repeatTimes-1;
+                            if(thisManyTimes!=-1)
+                            {
+                                animation16.setRepeatCount((int) thisManyTimes);
+                                b16.startAnimation(animation16);
+                            }
+                        }
                         ((ImageButton) findViewById(R.id.buttonSixteen)).setImageDrawable(purpleButtonLightOn);
                     }
                     else if(addBuffer16)
                     {
+                        if(!letIn16)
+                        {
+                            b16.clearAnimation();
+                        }
                         addBuffer16=false;
-                        /*numberOfStreams-=1.0;
-                        addCounter12=0;
-                        letIn12=false;
+                        numberOfStreams-=1.0;
+                        addCounter16=0;
+                        letIn16=false;
 
                         if(numberOfStreams==0)
                         {
-                            stopStreaming();
-                        }*/
+                            stopStream=true;
+                        }
                         ((ImageButton) findViewById(R.id.buttonSixteen)).setImageDrawable(purpleButtonLightOff);
                     }
                 } catch (Exception e) {
@@ -2229,12 +3071,17 @@ public class MainActivity extends Activity {
                     if(!addBuffer17)
                     {
 
-                        if (numberOfStreams == 0) {
+                        if (numberOfStreams == 0)
+                        {
                             stopStream=false;
                             numberOfStreams += 1.0;
+                            numberOfLiveTracks+=1.0;
                             startStreaming();
-                        } else {
+                        }
+                        else
+                        {
                             numberOfStreams += 1.0;
+                            numberOfLiveTracks-=1.0;
                         }
                         addBuffer17=true;
 
@@ -2263,19 +3110,23 @@ public class MainActivity extends Activity {
                 try {
                     if(!addBuffer18)
                     {
-                        /*
-                        if (numberOfStreams == 0) {
+
+                        if (numberOfStreams == 0)
+                        {
+                            stopStream=false;
                             numberOfStreams += 1.0;
                             startStreaming();
-                        } else {
+                        }
+                        else
+                        {
                             numberOfStreams += 1.0;
-                        }*/
+                        }
                         addBuffer18=true;
                         //((ImageButton) findViewById(R.id.buttonEighteen)).setImageDrawable(blueButtonLightOn);
                     }
                     else if(addBuffer18)
                     {
-                        addBuffer18=false;
+                        addCounter18=0;
                         /*numberOfStreams-=1.0;
                         addCounter12=0;
                         letIn12=false;
@@ -2294,30 +3145,33 @@ public class MainActivity extends Activity {
         b19.setOnClickListener(new View.OnClickListener() {
             public void onClick(View v) {
                 try {
+                    Log.d(TAG,"In onClickListener, this is i: "+i);
                     if(!addBuffer19)
                     {
-                        /*
-                        if (numberOfStreams == 0) {
+                        if (numberOfStreams == 0)
+                        {
+                            stopStream=false;
                             numberOfStreams += 1.0;
                             startStreaming();
-                        } else {
+                        }
+                        else
+                        {
                             numberOfStreams += 1.0;
-                        }*/
+                        }
                         addBuffer19=true;
-                        //((ImageButton) findViewById(R.id.buttonNineteen)).setImageDrawable(blueButtonLightOn);
+                        // ((ImageButton) findViewById(R.id.buttonSeventeen)).setImageDrawable(blueButtonLightOn);
                     }
                     else if(addBuffer19)
                     {
-                        addBuffer19=false;
+                        addCounter19=0;
                         /*numberOfStreams-=1.0;
                         addCounter12=0;
                         letIn12=false;
-
                         if(numberOfStreams==0)
                         {
                             stopStreaming();
                         }*/
-                        //((ImageButton) findViewById(R.id.buttonNineteen)).setImageDrawable(blueButtonLightOff);
+                        //((ImageButton) findViewById(R.id.buttonEighteen)).setImageDrawable(blueButtonLightOff);
                     }
                 } catch (Exception e) {
                     throw new RuntimeException(e);
@@ -2327,21 +3181,22 @@ public class MainActivity extends Activity {
         b20.setOnClickListener(new View.OnClickListener() {
             public void onClick(View v) {
                 try {
+                    Log.d(TAG,"In onClickListener, this is i: "+i);
                     if(!addBuffer20)
                     {
-                        /*
                         if (numberOfStreams == 0) {
+                            stopStream=false;
                             numberOfStreams += 1.0;
                             startStreaming();
                         } else {
                             numberOfStreams += 1.0;
-                        }*/
+                        }
                         addBuffer20=true;
-                        //((ImageButton) findViewById(R.id.buttonTwenty)).setImageDrawable(blueButtonLightOn);
+                        // ((ImageButton) findViewById(R.id.buttonSeventeen)).setImageDrawable(blueButtonLightOn);
                     }
                     else if(addBuffer20)
                     {
-                        addBuffer20=false;
+                        addCounter20=0;
                         /*numberOfStreams-=1.0;
                         addCounter12=0;
                         letIn12=false;
@@ -2350,7 +3205,7 @@ public class MainActivity extends Activity {
                         {
                             stopStreaming();
                         }*/
-                        //((ImageButton) findViewById(R.id.buttonTwenty)).setImageDrawable(blueButtonLightOff);
+                        //((ImageButton) findViewById(R.id.buttonEighteen)).setImageDrawable(blueButtonLightOff);
                     }
                 } catch (Exception e) {
                     throw new RuntimeException(e);
@@ -2360,21 +3215,24 @@ public class MainActivity extends Activity {
         b21.setOnClickListener(new View.OnClickListener() {
             public void onClick(View v) {
                 try {
-                    if(!addBuffer20)
+                    Log.d(TAG,"In onClickListener, this is i: "+i);
+                    if(!addBuffer21)
                     {
-                        /*
+
                         if (numberOfStreams == 0) {
+                            stopStream=false;
                             numberOfStreams += 1.0;
                             startStreaming();
                         } else {
                             numberOfStreams += 1.0;
-                        }*/
-                        addBuffer20=true;
-                        //((ImageButton) findViewById(R.id.buttonTwenty)).setImageDrawable(blueButtonLightOn);
+                        }
+                        addBuffer21=true;
+
+                        // ((ImageButton) findViewById(R.id.buttonSeventeen)).setImageDrawable(blueButtonLightOn);
                     }
-                    else if(addBuffer20)
+                    else if(addBuffer21)
                     {
-                        addBuffer20=false;
+                        addCounter21=0;
                         /*numberOfStreams-=1.0;
                         addCounter12=0;
                         letIn12=false;
@@ -2383,7 +3241,7 @@ public class MainActivity extends Activity {
                         {
                             stopStreaming();
                         }*/
-                        //((ImageButton) findViewById(R.id.buttonTwenty)).setImageDrawable(blueButtonLightOff);
+                        //((ImageButton) findViewById(R.id.buttonEighteen)).setImageDrawable(blueButtonLightOff);
                     }
                 } catch (Exception e) {
                     throw new RuntimeException(e);
@@ -2393,21 +3251,24 @@ public class MainActivity extends Activity {
         b22.setOnClickListener(new View.OnClickListener() {
             public void onClick(View v) {
                 try {
-                    if(!addBuffer20)
+                    Log.d(TAG,"In onClickListener, this is i: "+i);
+                    if(!addBuffer22)
                     {
-                        /*
+
                         if (numberOfStreams == 0) {
+                            stopStream=false;
                             numberOfStreams += 1.0;
                             startStreaming();
                         } else {
                             numberOfStreams += 1.0;
-                        }*/
-                        addBuffer20=true;
-                        //((ImageButton) findViewById(R.id.buttonTwenty)).setImageDrawable(blueButtonLightOn);
+                        }
+                        addBuffer22=true;
+
+                        // ((ImageButton) findViewById(R.id.buttonSeventeen)).setImageDrawable(blueButtonLightOn);
                     }
-                    else if(addBuffer20)
+                    else if(addBuffer22)
                     {
-                        addBuffer20=false;
+                        addCounter22=0;
                         /*numberOfStreams-=1.0;
                         addCounter12=0;
                         letIn12=false;
@@ -2416,7 +3277,7 @@ public class MainActivity extends Activity {
                         {
                             stopStreaming();
                         }*/
-                        //((ImageButton) findViewById(R.id.buttonTwenty)).setImageDrawable(blueButtonLightOff);
+                        //((ImageButton) findViewById(R.id.buttonEighteen)).setImageDrawable(blueButtonLightOff);
                     }
                 } catch (Exception e) {
                     throw new RuntimeException(e);
@@ -2426,21 +3287,24 @@ public class MainActivity extends Activity {
         b23.setOnClickListener(new View.OnClickListener() {
             public void onClick(View v) {
                 try {
-                    if(!addBuffer20)
+                    Log.d(TAG,"In onClickListener, this is i: "+i);
+                    if(!addBuffer23)
                     {
-                        /*
+
                         if (numberOfStreams == 0) {
+                            stopStream=false;
                             numberOfStreams += 1.0;
                             startStreaming();
                         } else {
                             numberOfStreams += 1.0;
-                        }*/
-                        addBuffer20=true;
-                        //((ImageButton) findViewById(R.id.buttonTwenty)).setImageDrawable(blueButtonLightOn);
+                        }
+                        addBuffer23=true;
+
+                        // ((ImageButton) findViewById(R.id.buttonSeventeen)).setImageDrawable(blueButtonLightOn);
                     }
-                    else if(addBuffer20)
+                    else if(addBuffer23)
                     {
-                        addBuffer20=false;
+                        addCounter23=0;
                         /*numberOfStreams-=1.0;
                         addCounter12=0;
                         letIn12=false;
@@ -2449,7 +3313,7 @@ public class MainActivity extends Activity {
                         {
                             stopStreaming();
                         }*/
-                        //((ImageButton) findViewById(R.id.buttonTwenty)).setImageDrawable(blueButtonLightOff);
+                        //((ImageButton) findViewById(R.id.buttonEighteen)).setImageDrawable(blueButtonLightOff);
                     }
                 } catch (Exception e) {
                     throw new RuntimeException(e);
@@ -2459,21 +3323,24 @@ public class MainActivity extends Activity {
         b24.setOnClickListener(new View.OnClickListener() {
             public void onClick(View v) {
                 try {
-                    if(!addBuffer20)
+                    Log.d(TAG,"In onClickListener, this is i: "+i);
+                    if(!addBuffer24)
                     {
-                        /*
+
                         if (numberOfStreams == 0) {
+                            stopStream=false;
                             numberOfStreams += 1.0;
                             startStreaming();
                         } else {
                             numberOfStreams += 1.0;
-                        }*/
-                        addBuffer20=true;
-                        ((ImageButton) findViewById(R.id.buttonTwenty)).setImageDrawable(blueButtonLightOn);
+                        }
+                        addBuffer24=true;
+
+                        // ((ImageButton) findViewById(R.id.buttonSeventeen)).setImageDrawable(blueButtonLightOn);
                     }
-                    else if(addBuffer20)
+                    else if(addBuffer24)
                     {
-                        addBuffer20=false;
+                        addCounter24=0;
                         /*numberOfStreams-=1.0;
                         addCounter12=0;
                         letIn12=false;
@@ -2482,7 +3349,7 @@ public class MainActivity extends Activity {
                         {
                             stopStreaming();
                         }*/
-                        ((ImageButton) findViewById(R.id.buttonTwenty)).setImageDrawable(blueButtonLightOff);
+                        //((ImageButton) findViewById(R.id.buttonEighteen)).setImageDrawable(blueButtonLightOff);
                     }
                 } catch (Exception e) {
                     throw new RuntimeException(e);
@@ -2993,7 +3860,7 @@ public class MainActivity extends Activity {
         //END APPLIES TO activity_main.xml
         */
         //Strange automatically added google stuff:
-        client = new GoogleApiClient.Builder(this).addApi(AppIndex.API).build();
+      //  client = new GoogleApiClient.Builder(this).addApi(AppIndex.API).build();
     }
 
     @Override
@@ -3001,7 +3868,7 @@ public class MainActivity extends Activity {
         super.onStart();
         // ATTENTION: This was auto-generated to implement the App Indexing API.
         // See https://g.co/AppIndexing/AndroidStudio for more information.
-        client.connect();
+      /*  client.connect();
         Action viewAction = Action.newAction(
                 Action.TYPE_VIEW, // TODO: choose an action type.
                 "Main Page", // TODO: Define a title for the content shown.
@@ -3012,7 +3879,7 @@ public class MainActivity extends Activity {
                 // TODO: Make sure this auto-generated app URL is correct.
                 Uri.parse("android-app://com.example.david.audiotracktest/http/host/path")
         );
-       // AppIndex.AppIndexApi.start(client, viewAction);
+        AppIndex.AppIndexApi.start(client, viewAction);*/
     }
 
     @Override
@@ -3020,7 +3887,7 @@ public class MainActivity extends Activity {
         super.onStop();
         // ATTENTION: This was auto-generated to implement the App Indexing API.
         // See https://g.co/AppIndexing/AndroidStudio for more information.
-        Action viewAction = Action.newAction(
+       /* Action viewAction = Action.newAction(
                 Action.TYPE_VIEW, // TODO: choose an action type.
                 "Main Page", // TODO: Define a title for the content shown.
                 // TODO: If you have web page content that matches this app activity's content,
@@ -3029,9 +3896,9 @@ public class MainActivity extends Activity {
                 Uri.parse("http://host/path"),
                 // TODO: Make sure this auto-generated app URL is correct.
                 Uri.parse("android-app://com.example.david.audiotracktest/http/host/path")
-        );
-      //  AppIndex.AppIndexApi.end(client, viewAction);
-        client.disconnect();
+        );*/
+     /*   AppIndex.AppIndexApi.end(client, viewAction);
+        client.disconnect();*/
         //
     }
     void startStreaming()
@@ -3088,7 +3955,7 @@ public class MainActivity extends Activity {
             Log.d(TAG+"loading","Starting to load #1");
             WavInfo wi1 = new WavInfo();
             Log.d(TAG+"loading","Attempting to get resource");
-            InputStream is1 = getResources().openRawResource(R.raw.beat1_mono);
+            InputStream is1 = getResources().openRawResource(R.raw.beat1);
             Log.d(TAG+"loading","Got resource, attempting header");
             dataSize1 = wi1.readHeader(is1);
             Log.d(TAG+"loading","Read header, attempting to read resource to byte buffer.");
@@ -3096,11 +3963,11 @@ public class MainActivity extends Activity {
             is1.read(data1, 0, data1.length);
             is1.close();
             Log.d(TAG+"loading","Finished loading #1");
-
+//1,2,3,13,15,16 drums.
             Log.d(TAG+"loading","Starting to load #2");
             WavInfo wi2 = new WavInfo();
             Log.d(TAG+"loading","Attempting to get resource");
-            InputStream is2 = getResources().openRawResource(R.raw.beat3_mono);
+            InputStream is2 = getResources().openRawResource(R.raw.beat3);
             Log.d(TAG+"loading","Got resource, attempting header");
             dataSize2 = wi2.readHeader(is2);
             Log.d(TAG+"loading","Read header, attempting to read resource to byte buffer.");
@@ -3119,60 +3986,95 @@ public class MainActivity extends Activity {
             Log.d(TAG+"loading","Starting loading #4");
             //
             WavInfo wi4 = new WavInfo();
-            InputStream is4 = getResources().openRawResource(R.raw.sub_bass1);
+            InputStream is4 = getResources().openRawResource(R.raw.hey_hey_hey);
             dataSize4 = wi4.readHeader(is4);
             data4 = new byte[dataSize4];
             is4.read(data4, 0, data4.length);
             is4.close();
 
             WavInfo wi5 = new WavInfo();
-            InputStream is5 = getResources().openRawResource(R.raw.sub_bass2);
+            InputStream is5 = getResources().openRawResource(R.raw.snare_filter);
             dataSize5 = wi5.readHeader(is5);
             data5 = new byte[dataSize5];
             is5.read(data5, 0, data5.length);
             is5.close();
 
             WavInfo wi6 = new WavInfo();
-            InputStream is6 = getResources().openRawResource(R.raw.synth_bass);
+            InputStream is6 = getResources().openRawResource(R.raw.kick_snare_dope);
             dataSize6 = wi6.readHeader(is6);
             data6 = new byte[dataSize6];
             is6.read(data6, 0, data6.length);
             is6.close();
 
             WavInfo wi7 = new WavInfo();
-            InputStream is7 = getResources().openRawResource(R.raw.boxy_synth);
+            InputStream is7 = getResources().openRawResource(R.raw.sub_bass1);
             dataSize7 = wi7.readHeader(is7);
             data7 = new byte[dataSize7];
             is7.read(data7, 0, data7.length);
             is7.close();
 
             WavInfo wi8 = new WavInfo();
-            InputStream is8 = getResources().openRawResource(R.raw.bright_strings);
+            InputStream is8 = getResources().openRawResource(R.raw.sub_bass2);
             dataSize8 = wi8.readHeader(is8);
             data8 = new byte[dataSize8];
             is8.read(data8, 0, data8.length);
             is8.close();
 
             WavInfo wi9 = new WavInfo();
-            InputStream is9 = getResources().openRawResource(R.raw.chords);
+            InputStream is9 = getResources().openRawResource(R.raw.synth_bass);
             dataSize9 = wi9.readHeader(is9);
             data9 = new byte[dataSize9];
             is9.read(data9, 0, data9.length);
             is9.close();
 
             WavInfo wi10 = new WavInfo();
-            InputStream is10 = getResources().openRawResource(R.raw.epic_brass);
+            InputStream is10 = getResources().openRawResource(R.raw.chords);
             dataSize10 = wi10.readHeader(is10);
             data10 = new byte[dataSize10];
             is10.read(data10, 0, data10.length);
             is10.close();
 
             WavInfo wi11 = new WavInfo();
-            InputStream is11 = getResources().openRawResource(R.raw.lead1);
+            InputStream is11 = getResources().openRawResource(R.raw.clarinet_chords);
             dataSize11 = wi11.readHeader(is11);
             data11 = new byte[dataSize11];
             is11.read(data11, 0, data11.length);
             is11.close();
+
+            WavInfo wi12 = new WavInfo();
+            InputStream is12 = getResources().openRawResource(R.raw.bright_strings);
+            dataSize12 = wi12.readHeader(is12);
+            data12 = new byte[dataSize12];
+            is12.read(data12, 0, data12.length);
+            is12.close();
+
+            WavInfo wi13 = new WavInfo();
+            InputStream is13 = getResources().openRawResource(R.raw.boxy_synth);//boxy
+            dataSize13 = wi13.readHeader(is13);
+            data13 = new byte[dataSize13];
+            is13.read(data13, 0, data13.length);
+            is13.close();
+
+            WavInfo wi14 = new WavInfo();
+            InputStream is14 = getResources().openRawResource(R.raw.simple_comp);
+            dataSize14 = wi14.readHeader(is14);
+            data14 = new byte[dataSize14];
+            is14.read(data14, 0, data14.length);
+            is14.close();
+
+            WavInfo wi15 = new WavInfo();
+            InputStream is15 = getResources().openRawResource(R.raw.lead1);
+            dataSize15 = wi15.readHeader(is15);
+            data15 = new byte[dataSize15];
+            is15.read(data15, 0, data15.length);
+            is15.close();
+
+            WavInfo wi16 = new WavInfo();
+            InputStream is16 = getResources().openRawResource(R.raw.epic_brass);
+            dataSize16 = wi16.readHeader(is16);
+            data16 = new byte[dataSize16];
+            is16.read(data16, 0, data16.length);
+            is16.close();
 
             WavInfo wi17 = new WavInfo();
             InputStream is17 = getResources().openRawResource(R.raw.jazz_organ);
@@ -3180,7 +4082,57 @@ public class MainActivity extends Activity {
             data17 = new byte[dataSize17];
             is17.read(data17, 0, data17.length);
             is17.close();
-            Log.d(TAG+"loading","Finished loading all 12 files.");
+
+            WavInfo wi18 = new WavInfo();
+            InputStream is18 = getResources().openRawResource(R.raw.live_robot_burp);
+            dataSize18 = wi18.readHeader(is18);
+            data18 = new byte[dataSize18];
+            is18.read(data18, 0, data18.length);
+            is18.close();
+
+            WavInfo wi19 = new WavInfo();
+            InputStream is19 = getResources().openRawResource(R.raw.live_crash);
+            dataSize19 = wi19.readHeader(is19);
+            data19 = new byte[dataSize19];
+            is19.read(data19, 0, data19.length);
+            is19.close();
+
+            WavInfo wi20 = new WavInfo();
+            InputStream is20 = getResources().openRawResource(R.raw.live_effect_1);
+            dataSize20 = wi20.readHeader(is20);
+            data20 = new byte[dataSize20];
+            is20.read(data20, 0, data20.length);
+            is20.close();
+
+            WavInfo wi21 = new WavInfo();
+            InputStream is21 = getResources().openRawResource(R.raw.live_808_kick);
+            dataSize21 = wi21.readHeader(is21);
+            data21 = new byte[dataSize21];
+            is21.read(data21, 0, data21.length);
+            is21.close();
+
+            WavInfo wi22 = new WavInfo();
+            InputStream is22 = getResources().openRawResource(R.raw.live_exotic_tomb);
+            dataSize22 = wi22.readHeader(is22);
+            data22 = new byte[dataSize22];
+            is22.read(data22, 0, data22.length);
+            is22.close();
+
+            WavInfo wi23 = new WavInfo();
+            InputStream is23 = getResources().openRawResource(R.raw.live_longassnare);
+            dataSize23 = wi23.readHeader(is23);
+            data23 = new byte[dataSize23];
+            is23.read(data23, 0, data23.length);
+            is23.close();
+
+            WavInfo wi24 = new WavInfo();
+            InputStream is24 = getResources().openRawResource(R.raw.live_ride);
+            dataSize24 = wi24.readHeader(is24);
+            data24 = new byte[dataSize24];
+            is24.read(data24, 0, data24.length);
+            is24.close();
+
+            Log.d(TAG+"loading","Finished loading all files.");
             //
         } catch (IOException e) {
             throw e;

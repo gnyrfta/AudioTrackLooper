@@ -1,4 +1,5 @@
 package com.gnyrfta.david.audiotracklooper;
+
 /**
  * Created by david on 2016-10-03.
  */
@@ -15,7 +16,7 @@ import com.google.android.gms.ads.InterstitialAd;
 
 public class SplashScreen extends Activity
 {
-    private static int SPLASH_TIME_OUT = 5000;
+    private static int SPLASH_TIME_OUT = 7000;
     InterstitialAd mInterstitialAd;
     String TAG = "SplashScreen";
     @Override
@@ -26,7 +27,6 @@ public class SplashScreen extends Activity
         mInterstitialAd = new InterstitialAd(this);
         mInterstitialAd.setAdUnitId("ca-app-pub-3940256099942544/1033173712");
         mInterstitialAd.setAdListener(new AdListener() {
-
             @Override
             public void onAdFailedToLoad(int errorCode) {
                 super.onAdFailedToLoad(errorCode);
@@ -36,7 +36,7 @@ public class SplashScreen extends Activity
 
             @Override
             public void onAdClosed() {
-                requestNewInterstitial();
+               // requestNewInterstitial();
                 //beginPlayingGame();
             }
         });
@@ -51,22 +51,23 @@ public class SplashScreen extends Activity
 
             @Override
             public void run() {
-                // This method will be executed once the timer is over
+                // This method will be executted once the timer is over
                 // Start your app main activity
+                new Handler().postDelayed(new Runnable() {
 
-                if(mInterstitialAd.isLoaded())
-                {
-                    mInterstitialAd.show();
+                @Override
+                public void run() {
+                    if (mInterstitialAd.isLoaded()) {
+                        mInterstitialAd.show();
+                    } else {
+                        mInterstitialAd.getAdListener().onAdFailedToLoad(0);
+                    }
                 }
-                else
-                {
-                    mInterstitialAd.getAdListener().onAdFailedToLoad(0);
-                }
+            },200);
 
                 Intent i = new Intent(SplashScreen.this, MainActivity.class);
                 startActivity(i);
                 overridePendingTransition(android.R.anim.fade_in, android.R.anim.fade_out);
-
                 // close this activity
                 finish();
             }
@@ -74,6 +75,10 @@ public class SplashScreen extends Activity
     }
     private void requestNewInterstitial() {
         AdRequest adRequest = new AdRequest.Builder().addTestDevice("77669351E6DF0BE1F21D3613C8BF92ED").build();//"77669351E6DF0BE1F21D3613C8BF92ED"
+        AdListener adListener = mInterstitialAd.getAdListener();
             mInterstitialAd.loadAd(adRequest);
+
+
     }
+
 }

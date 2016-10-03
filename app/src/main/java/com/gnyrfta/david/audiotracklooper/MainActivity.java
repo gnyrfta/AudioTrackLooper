@@ -8,6 +8,7 @@ import android.media.AudioManager;
 import android.media.AudioTrack;
 import android.net.Uri;
 import android.os.Bundle;
+import android.os.Handler;
 import android.util.DisplayMetrics;
 import android.util.Log;
 import android.util.TypedValue;
@@ -16,13 +17,15 @@ import android.view.View;
 import android.view.animation.AlphaAnimation;
 import android.view.animation.Animation;
 import android.view.animation.LinearInterpolator;
+import android.widget.Button;
 import android.widget.ImageButton;
 import android.widget.LinearLayout;
 
 
-import com.google.android.gms.appindexing.Action;
-import com.google.android.gms.appindexing.AppIndex;
+import com.google.android.gms.ads.AdListener;
+import com.google.android.gms.ads.AdRequest;
 import com.google.android.gms.common.api.GoogleApiClient;
+import com.google.android.gms.ads.InterstitialAd;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -48,6 +51,8 @@ import java.util.Arrays;
         along with Trap Music Pads.  If not, see <http://www.gnu.org/licenses/>.
  */
 public class MainActivity extends Activity {
+    //public InterstitialAd mInterStitialAd;
+
     private String TAG = "MainActivity";
     //These have to be at least accessible outside the scope of their methods, cause gonna have to mix them with each other.
     public byte[] data1;
@@ -258,7 +263,9 @@ public class MainActivity extends Activity {
 
 
     //
-
+    InterstitialAd mInterstitialAd;
+    public boolean firstTimeResuming=true;
+    public int amountOfTimesResuming=0;
     //constants needed for the streaming:
     volatile boolean m_stop = false; //Keep feeding data.
     AudioTrack m_audioTrack; //Our audiotrack that we write to.
@@ -1915,8 +1922,30 @@ public class MainActivity extends Activity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-
         setContentView(R.layout.activity_main4);
+        mInterstitialAd = new InterstitialAd(this);
+        mInterstitialAd.setAdUnitId("ca-app-pub-3940256099942544/1033173712");
+        mInterstitialAd.setAdListener(new AdListener() {
+            @Override
+            public void onAdFailedToLoad(int errorCode) {
+                super.onAdFailedToLoad(errorCode);
+                String msg = errorCode +"";
+                Log.d(TAG,"ERROR CODE FOR LOADING: "+msg);
+            }
+
+            @Override
+            public void onAdClosed() {
+                // requestNewInterstitial();
+                //beginPlayingGame();
+            }
+        });
+        requestNewInterstitial();
+       /* InterstitialAd ad = SplashScreen.adManager.getAd();
+        if(ad.isLoaded())
+        {
+            ad.show();
+            SplashScreen.adManager.createAd();
+        }*/
 
         try
         {
@@ -1950,6 +1979,24 @@ public class MainActivity extends Activity {
         ImageButton b22 = (ImageButton) findViewById(R.id.buttonTwentytwo);
         ImageButton b23 = (ImageButton) findViewById(R.id.buttonTwentythree);
         ImageButton b24 = (ImageButton) findViewById(R.id.buttonTwentyfour);
+       // Button showAdButton = (Button)findViewById(R.id.showAdButton);
+      /*  showAdButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+
+            }
+        });*/
+   /*     mInterStitialAd = new InterstitialAd(this);
+        mInterStitialAd.setAdUnitId("ca-app-pub-3940256099942544/1033173712");
+        mInterStitialAd.setAdListener(new AdListener() {
+            @Override
+            public void onAdClosed() {
+                requestNewInterstitial();
+                //beginPlayingGame();
+            }
+        });
+
+        requestNewInterstitial();*/
 
         //Get screenwidth.
         //Get screenheight.
@@ -3357,6 +3404,22 @@ public class MainActivity extends Activity {
             }
         });
 
+       /* if(mInterStitialAd.isLoaded())
+        {
+            mInterStitialAd.show();
+        }
+        else
+        {
+            //Do nothing.
+        }*/
+        /*new Handler().postDelayed(new Runnable()
+        {
+            @Override
+            public void run()
+            {
+                mInterStitialAd.show();
+            }
+        }, 2000);*/
         //End: applies to activity_main3.xml
         //START: applies to activity_main2.xml
         /*
@@ -3864,6 +3927,34 @@ public class MainActivity extends Activity {
     }
 
     @Override
+    public void onResume()
+    {
+        super.onResume();
+        Log.d(TAG,"In onResume, counter: "+amountOfTimesResuming);
+
+        /*if(amountOfTimesResuming>4)
+        {
+            new Handler().postDelayed(new Runnable() {
+
+                @Override
+                public void run() {
+                    if (mInterstitialAd.isLoaded()) {
+                        mInterstitialAd.show();
+                        requestNewInterstitial();
+                    } else {
+                        // mInterstitialAd.getAdListener().onAdFailedToLoad(0);
+                    }
+                }
+            }, 200);
+        }
+        else
+        {
+            //Too early to show ads.
+        }*/
+        amountOfTimesResuming++;
+
+    }
+    @Override
     public void onStart() {
         super.onStart();
         // ATTENTION: This was auto-generated to implement the App Indexing API.
@@ -4358,5 +4449,16 @@ public class MainActivity extends Activity {
     synchronized void setOff11()
     {
         b11.setImageDrawable(purpleButtonLightOff);
+    }
+    /*private void requestNewInterstitial() {
+        AdRequest adRequest = new AdRequest.Builder()
+                .addTestDevice("398ACAF8351376FF")
+                .build();
+        mInterStitialAd.loadAd(adRequest);
+    }*/
+    private void requestNewInterstitial() {
+        AdRequest adRequest = new AdRequest.Builder().addTestDevice("77669351E6DF0BE1F21D3613C8BF92ED").build();//"77669351E6DF0BE1F21D3613C8BF92ED"
+        AdListener adListener = mInterstitialAd.getAdListener();
+        mInterstitialAd.loadAd(adRequest);
     }
 }

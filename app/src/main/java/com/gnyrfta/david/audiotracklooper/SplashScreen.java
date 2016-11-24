@@ -25,7 +25,7 @@ public class SplashScreen extends Activity
         super.onCreate(savedInstanceState);
         getWindow().setBackgroundDrawable(null);
         mInterstitialAd = new InterstitialAd(this);
-        mInterstitialAd.setAdUnitId("ca-app-pub-3940256099942544/1033173712");
+        mInterstitialAd.setAdUnitId("ca-app-pub-6801878837747534/2396011208");
         mInterstitialAd.setAdListener(new AdListener() {
             @Override
             public void onAdFailedToLoad(int errorCode) {

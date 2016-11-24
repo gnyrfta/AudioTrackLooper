@@ -29,6 +29,7 @@ import com.google.android.gms.ads.InterstitialAd;
 
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.RandomAccessFile;
 import java.util.Arrays;
 
 
@@ -110,6 +111,7 @@ public class MainActivity extends Activity {
     public static volatile byte[] tempBuffer;
     public volatile boolean changedBuffer=false;
     public volatile int i=0;
+    public volatile boolean audioTrackCreated=false;
     //
     public volatile boolean addBuffer1=false;
     public volatile boolean addBuffer2=false;
@@ -216,7 +218,7 @@ public class MainActivity extends Activity {
     public volatile int removeCounter15=0;
     public volatile int removeCounter16=0;
 
-    public volatile int bufferLength=200;
+    public volatile int bufferLength=256;
 
     public volatile float numberOfStreams=0;
     public volatile int numberOfLiveTracks=0;
@@ -270,6 +272,7 @@ public class MainActivity extends Activity {
     volatile boolean m_stop = false; //Keep feeding data.
     AudioTrack m_audioTrack; //Our audiotrack that we write to.
     Thread audioTrackThread; //Our thread where we write to the AudioTrack.
+    Thread cpuCheckerThread;
     /**
      * ATTENTION: This was auto-generated to implement the App Indexing API.
      * See https://g.co/AppIndexing/AndroidStudio for more information.
@@ -449,13 +452,13 @@ public class MainActivity extends Activity {
         }*/
     }
 
-     volatile Runnable feedToBuffer = new Runnable()
+    volatile Runnable feedToBuffer = new Runnable()
     {
         @Override
         public synchronized void run() {
             int wavCounter=0;
             int wavFileNumber=0;
-            Thread.currentThread().setPriority(Thread.MIN_PRIORITY);//Don't know what this does. But I guess its good.
+            Thread.currentThread().setPriority(Thread.MAX_PRIORITY);//Don't know what this does. But I guess its good.
             //While we have not stopped the audio, feed the buffer data2 to output.
             //All the buffers should be the same length, using data6 here but hopefully could have used any array:
             byte[] testBuffer=new byte[data6.length];//Should create an array of zeros, although there seems to be debate about whether the default value is
@@ -1180,7 +1183,6 @@ public class MainActivity extends Activity {
                         //Blink
                     }
                     if(letIn12) {
-
                         byte[] subBuffer = Arrays.copyOfRange(data12, addCounter12, addCounter12 + bufferLength);
                         byte[] temporaryBufferWithAdjustedAmplitude = new byte[bufferLength];
                         for (int m = 0; m < subBuffer.length; m += 2) {
@@ -1214,9 +1216,7 @@ public class MainActivity extends Activity {
                             resultingBuffer[m] = (byte) res;
                             resultingBuffer[m + 1] = (byte) (res >> 8);
                             addCounter12 += 2;
-                            Log.d(TAG,"should be playing #12");
-                            if (addCounter12 >= (data12.length - bufferLength))
-                            {
+                            if (addCounter12 >= (data12.length - bufferLength)) {
                                 addCounter12 = 0;
                             }
                         }
@@ -2715,11 +2715,11 @@ public class MainActivity extends Activity {
         });
         b12.setOnClickListener(new View.OnClickListener() {
             public void onClick(View v) {
+
                 try {
                     if(!addBuffer12)
                     {
                         if (numberOfStreams == 0) {
-                            Log.d(TAG,"Added number 12 to stream.");
                             stopStream=false;
                             numberOfStreams += 1.0;
                             addBuffer12 = true;
@@ -3931,7 +3931,12 @@ public class MainActivity extends Activity {
     {
         super.onResume();
         Log.d(TAG,"In onResume, counter: "+amountOfTimesResuming);
-
+        //m_stop=false;
+            if(audioTrackCreated)
+            {
+                audioTrackThread.setPriority(Thread.MAX_PRIORITY);
+                m_audioTrack.setStereoVolume(1, 1);
+            }
         /*if(amountOfTimesResuming>4)
         {
             new Handler().postDelayed(new Runnable() {
@@ -3992,6 +3997,16 @@ public class MainActivity extends Activity {
         client.disconnect();*/
         //
     }
+    @Override
+    public void onPause()
+    {
+        super.onPause();
+        //m_stop=true;
+        if(audioTrackCreated) {
+            audioTrackThread.setPriority(Thread.MIN_PRIORITY);
+            m_audioTrack.setStereoVolume(0,0);
+        }
+    }
     void startStreaming()
     {
         int STREAM_MUSIC = 3;
@@ -4018,12 +4033,25 @@ public class MainActivity extends Activity {
             m_audioTrack.play();
             audioTrackThread = new Thread(feedToBuffer);
             audioTrackThread.start();
+            audioTrackCreated=true;
         }
         catch (Exception e)
         {
             throw new RuntimeException(e);
         }
     }
+   /* void startCheckingCPU()
+    {
+     try
+     {
+         cpuCheckerThread = new Thread(cpuChecker);
+         cpuCheckerThread.start();
+     }
+     catch(Exception e)
+     {
+         throw new RuntimeException(e);
+     }
+    }*/
     void stopStreaming()
     {
         m_stop = true;
@@ -4460,5 +4488,38 @@ public class MainActivity extends Activity {
         AdRequest adRequest = new AdRequest.Builder().addTestDevice("77669351E6DF0BE1F21D3613C8BF92ED").build();//"77669351E6DF0BE1F21D3613C8BF92ED"
         AdListener adListener = mInterstitialAd.getAdListener();
         mInterstitialAd.loadAd(adRequest);
+    }
+    private float readUsage() {
+        try {
+            RandomAccessFile reader = new RandomAccessFile("/proc/stat", "r");
+            String load = reader.readLine();
+
+            String[] toks = load.split(" +");  // Split on one or more spaces
+
+            long idle1 = Long.parseLong(toks[4]);
+            long cpu1 = Long.parseLong(toks[2]) + Long.parseLong(toks[3]) + Long.parseLong(toks[5])
+                    + Long.parseLong(toks[6]) + Long.parseLong(toks[7]) + Long.parseLong(toks[8]);
+
+            try {
+                Thread.sleep(360);
+            } catch (Exception e) {}
+
+            reader.seek(0);
+            load = reader.readLine();
+            reader.close();
+
+            toks = load.split(" +");
+
+            long idle2 = Long.parseLong(toks[4]);
+            long cpu2 = Long.parseLong(toks[2]) + Long.parseLong(toks[3]) + Long.parseLong(toks[5])
+                    + Long.parseLong(toks[6]) + Long.parseLong(toks[7]) + Long.parseLong(toks[8]);
+
+            return (float)(cpu2 - cpu1) / ((cpu2 + idle2) - (cpu1 + idle1));
+
+        } catch (IOException ex) {
+            ex.printStackTrace();
+        }
+
+        return 0;
     }
 }

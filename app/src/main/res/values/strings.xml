@@ -1,4 +1,15 @@
 <resources>
     <string name="app_name">Trap Music Pads</string>
     <string name="banner_ad_unit_id">ca-app-pub-3940256099942544/6300978111</string>
+    <string name="ok">OK</string>
+    <string name="info"><![CDATA[ \n\n<b>If you experience problems with audio crackle it is probably due to high load on your cpu.</b>
+There are two solutions to this - either do not run as many applications in the background or lower the quality of the audio files from
+44.1 Hz to something else using the button in the top panel. \n\nThis project is open source and released under
+GPL v3. You can view the source code on <a href="https://github.com/gnyrfta/AudioTrackLooper"> Github</a>.
+\n\nThe software is created by <a href=\"http://www.gnyrftacode.se\">David Jacobsson</a> and the audio tracks by
+<a href="https://henrikjacobsson.com/">Henrik Jacobsson</a>.
+The little star you can click for rating was created by open clip art creator \'Meticulous\'.\n\n
+For more info, see <a href="www.gnyrftacode.se/trap-music-pads"> www.gnyrftacode.se/trap-music-pads</a>
+Bugs, praise, suggestions and rants are gratefully accepted at gnyrfta@gmail.com]]> </string>
+    <string name="rating">Rating: </string>
 </resources>

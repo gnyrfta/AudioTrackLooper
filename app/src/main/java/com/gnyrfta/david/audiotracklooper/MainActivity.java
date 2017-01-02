@@ -28,6 +28,8 @@ import android.view.animation.LinearInterpolator;
 import android.widget.Button;
 import android.widget.ImageButton;
 import android.widget.LinearLayout;
+import android.widget.RadioButton;
+import android.widget.RadioGroup;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -91,6 +93,31 @@ public class MainActivity extends Activity {
     public byte[] data23;
     public byte[] data24;
 
+    public byte[] data1_22;
+    public byte[] data2_22;
+    public byte[] data3_22;
+    public byte[] data4_22;
+    public byte[] data5_22;
+    public byte[] data6_22;
+    public byte[] data7_22;//buffer for button seven.
+    public byte[] data8_22;//buffer for button eight.
+    public byte[] data9_22;//buffer for button nine.
+    public byte[] data10_22;
+    public byte[] data11_22;
+    public byte[] data12_22;
+    public byte[] data13_22;
+    public byte[] data14_22;
+    public byte[] data15_22;
+    public byte[] data16_22;
+    public byte[] data17_22;
+    public byte[] data18_22;
+    public byte[] data19_22;
+    public byte[] data20_22;
+    public byte[] data21_22;
+    public byte[] data22_22;
+    public byte[] data23_22;
+    public byte[] data24_22;
+
     public int dataSize1;
     public int dataSize2;
     public int dataSize3;
@@ -116,6 +143,9 @@ public class MainActivity extends Activity {
     public int dataSize23;
     public int dataSize24;
 
+    public int quality = 44;
+    public boolean fortyFourFilled=false;
+    public boolean twentyTwoFilled=false;
 
     public static volatile byte[] outputBuffer;
     public static volatile byte[] tempBuffer;
@@ -213,7 +243,8 @@ public class MainActivity extends Activity {
 
     Button rateButton;
     Button infoButton;
-    ImageButton qualityButton;
+    /*Uncomment to add choice of changing quality - this does not work yet.*/
+   // ImageButton qualityButton;
     ImageButton b1;
     ImageButton b2;
     ImageButton b3;
@@ -238,6 +269,7 @@ public class MainActivity extends Activity {
     //constants needed for the streaming:
     volatile boolean m_stop = false; //Keep feeding data.
     AudioTrack m_audioTrack; //Our audiotrack that we write to.
+    AudioTrack m_audioTrack_22;
     Thread audioTrackThread; //Our thread where we write to the AudioTrack.
     Thread cpuCheckerThread;
     /**
@@ -495,10 +527,12 @@ public class MainActivity extends Activity {
             i = 0;
             while(!m_stop)
             {
-                Log.d(TAG,"Letting tracks in.");
+                if(quality==44)
+                {
+                    Log.d(TAG, "Letting tracks in.");
 
-                //Should store a files about twice per second.
-                //Uncomment to store wav files for debug:
+                    //Should store a files about twice per second.
+                    //Uncomment to store wav files for debug:
 
                 /*
                 if(wavCounter>2000)
@@ -506,269 +540,470 @@ public class MainActivity extends Activity {
                     saveToWav(testBuffer,wavFileNumber);
                     wavCounter=0;
                 }*/
-                //temp is the array that we write to audiotrack and which contains the amplitudes of all the active audiotracks summed together.
-                //resultingBuffer[] is emptied and refilled for each active track and added to temp[].
-                byte[] temp = new byte[bufferLength];
-                byte[] resultingBuffer = new byte[temp.length];
-                if(addBuffer1)
-                {
-                    if(i==0)//Letting tracks in at zero.
-                    {
-                        Log.d(TAG,"Letting tracks in.");
-                        letIn1=true;
+                    //temp is the array that we write to audiotrack and which contains the amplitudes of all the active audiotracks summed together.
+                    //resultingBuffer[] is emptied and refilled for each active track and added to temp[].
+                    byte[] temp = new byte[bufferLength];
+                    byte[] resultingBuffer = new byte[temp.length];
+                    if (addBuffer1) {
+                        if (i == 0)//Letting tracks in at zero.
+                        {
+                            Log.d(TAG, "Letting tracks in.");
+                            letIn1 = true;
+                        } else if (numberOfStreams - numberOfLiveTracks == 0) {
+                            //should start immediately, but don't know how to do this yet.
+                        }
+                        if (letIn1) {
+                            temp = addToSoundArray(temp, resultingBuffer, data1, addCounter1, 1);
+                        }
                     }
-                    else if(numberOfStreams-numberOfLiveTracks==0)
-                    {
-                        //should start immediately, but don't know how to do this yet.
-                    }
-                    if(letIn1)
-                    {
-                        temp = addToSoundArray(temp,resultingBuffer,data1,addCounter1,1);
-                    }
-                }
 
-                if(addBuffer2)
-                {
-                    if(i==0)//actually should be 37220, but i is always a multiple of bufferlength, which is 100.Fun fact : there is an asteroid called 18610 ArthurDent.
-                    {
-                        Log.d(TAG,"Letting tracks in.");
-                        letIn2=true;
+                    if (addBuffer2) {
+                        if (i == 0)//actually should be 37220, but i is always a multiple of bufferlength, which is 100.Fun fact : there is an asteroid called 18610 ArthurDent.
+                        {
+                            Log.d(TAG, "Letting tracks in.");
+                            letIn2 = true;
+                        }
+                        if (letIn2) {
+                            temp = addToSoundArray(temp, resultingBuffer, data2, addCounter2, 2);
+                        }
                     }
-                    if(letIn2)
-                    {
-                        temp = addToSoundArray(temp,resultingBuffer,data2,addCounter2,2);
+                    if (addBuffer3) {
+                        if (i == 0)//actually should be 37220, but i is always a multiple of bufferlength, which is 100.Fun fact : there is an asteroid called 18610 ArthurDent.
+                        {
+                            Log.d(TAG, "Letting tracks in.");
+                            letIn3 = true;
+                        }
+                        if (letIn3) {
+                            temp = addToSoundArray(temp, resultingBuffer, data3, addCounter3, 3);
+                        }
                     }
-                }
-                if(addBuffer3)
-                {
-                    if(i==0)//actually should be 37220, but i is always a multiple of bufferlength, which is 100.Fun fact : there is an asteroid called 18610 ArthurDent.
-                    {
-                        Log.d(TAG,"Letting tracks in.");
-                        letIn3=true;
+                    if (addBuffer4) {
+                        if (i == 0)//actually should be 37220, but i is always a multiple of bufferlength, which is 100.Fun fact : there is an asteroid called 18610 ArthurDent.
+                        {
+                            Log.d(TAG, "Letting tracks in.");
+                            letIn4 = true;
+                        }
+                        if (letIn4) {
+                            temp = addToSoundArray(temp, resultingBuffer, data4, addCounter4, 4);
+                        }
                     }
-                    if(letIn3)
-                    {
-                        temp = addToSoundArray(temp,resultingBuffer,data3,addCounter3,3);
+                    if (addBuffer5) {
+                        if (i == 0)//actually should be 37220, but i is always a multiple of bufferlength, which is 100.Fun fact : there is an asteroid called 18610 ArthurDent.
+                        {
+                            Log.d(TAG, "Letting tracks in.");
+                            letIn5 = true;
+                        }
+                        if (letIn5) {
+                            temp = addToSoundArray(temp, resultingBuffer, data5, addCounter5, 5);
+                        }
                     }
-                }
-                if(addBuffer4)
-                {
-                    if(i==0)//actually should be 37220, but i is always a multiple of bufferlength, which is 100.Fun fact : there is an asteroid called 18610 ArthurDent.
-                    {
-                        Log.d(TAG,"Letting tracks in.");
-                        letIn4=true;
+                    //
+                    if (addBuffer6) {
+                        if (i == 0)//actually should be 37220, but i is always a multiple of bufferlength, which is 100.Fun fact : there is an asteroid called 18610 ArthurDent.
+                        {
+                            Log.d(TAG, "Letting tracks in.");
+                            letIn6 = true;
+                        }
+                        if (letIn6) {
+                            temp = addToSoundArray(temp, resultingBuffer, data6, addCounter6, 6);
+                        }
                     }
-                    if(letIn4)
-                    {
-                        temp = addToSoundArray(temp,resultingBuffer,data4,addCounter4,4);
+
+                    if (addBuffer7) {
+                        if (i == 0)//actually should be 37220, but i is always a multiple of bufferlength, which is 100.Fun fact : there is an asteroid called 18610 ArthurDent.
+                        {
+                            Log.d(TAG, "Letting tracks in.");
+                            letIn7 = true;
+                        }
+                        if (letIn7) {
+                            temp = addToSoundArray(temp, resultingBuffer, data7, addCounter7, 7);
+                        }
                     }
-                }
-                if(addBuffer5)
-                {
-                    if(i==0)//actually should be 37220, but i is always a multiple of bufferlength, which is 100.Fun fact : there is an asteroid called 18610 ArthurDent.
-                    {
-                        Log.d(TAG,"Letting tracks in.");
-                        letIn5=true;
+                    if (addBuffer8) {
+                        if (i == 0)//actually should be 37220, but i is always a multiple of bufferlength, which is 100.Fun fact : there is an asteroid called 18610 ArthurDent.
+                        {
+                            Log.d(TAG, "Letting tracks in.");
+                            letIn8 = true;
+                        }
+                        if (letIn8) {
+                            temp = addToSoundArray(temp, resultingBuffer, data8, addCounter8, 8);
+                        }
                     }
-                    if(letIn5)
+                    if (addBuffer9) {
+                        if (i == 0)//actually should be 37220, but i is always a multiple of bufferlength, which is 100.Fun fact : there is an asteroid called 18610 ArthurDent.
+                        {
+                            Log.d(TAG, "Letting tracks in.");
+                            letIn9 = true;
+                        }
+                        if (letIn9) {
+                            temp = addToSoundArray(temp, resultingBuffer, data9, addCounter9, 9);
+                        }
+                    }
+                    //
+                    if (addBuffer10) {
+                        if (i == 0)//actually should be 37220, but i is always a multiple of bufferlength, which is 100.Fun fact : there is an asteroid called 18610 ArthurDent.
+                        {
+                            Log.d(TAG, "Letting tracks in.");
+                            letIn10 = true;
+                        }
+                        if (letIn10) {
+                            temp = addToSoundArray(temp, resultingBuffer, data10, addCounter10, 10);
+                        }
+                    }
+                    //
+                    if (addBuffer11) {
+                        if (i == 0)//actually should be 37220, but i is always a multiple of bufferlength, which is 100.Fun fact : there is an asteroid called 18610 ArthurDent.
+                        {
+                            Log.d(TAG, "Letting tracks in.");
+                            letIn11 = true;
+                        }
+                        if (letIn11) {
+                            temp = addToSoundArray(temp, resultingBuffer, data11, addCounter11, 11);
+                        }
+                    }
+                    if (addBuffer12) {
+                        if (i == 0)//actually should be 37220, but i is always a multiple of bufferlength, which is 100.Fun fact : there is an asteroid called 18610 ArthurDent.
+                        {
+                            Log.d(TAG, "Letting tracks in.");
+                            letIn12 = true;
+                        }
+                        if (letIn12) {
+                            temp = addToSoundArray(temp, resultingBuffer, data12, addCounter12, 12);
+                        }
+                    }
+                    if (addBuffer13) {
+                        if (i == 0)//actually should be 37220, but i is always a multiple of bufferlength, which is 100.Fun fact : there is an asteroid called 18610 ArthurDent.
+                        {
+                            Log.d(TAG, "Letting tracks in.");
+                            letIn13 = true;
+                        }
+                        if (letIn13) {
+                            temp = addToSoundArray(temp, resultingBuffer, data13, addCounter13, 13);
+                        }
+                    }
+                    if (addBuffer14) {
+                        if (i == 0)//actually should be 37220, but i is always a multiple of bufferlength, which is 100.Fun fact : there is an asteroid called 18610 ArthurDent.
+                        {
+                            Log.d(TAG, "Letting tracks in.");
+                            letIn14 = true;
+                        }
+                        if (letIn14) {
+                            temp = addToSoundArray(temp, resultingBuffer, data14, addCounter14, 14);
+                        }
+                    }
+                    if (addBuffer15) {
+                        if (i == 0)//actually should be 37220, but i is always a multiple of bufferlength, which is 100.Fun fact : there is an asteroid called 18610 ArthurDent.
+                        {
+                            Log.d(TAG, "Letting tracks in.");
+                            letIn15 = true;
+                        }
+                        if (letIn15) {
+                            temp = addToSoundArray(temp, resultingBuffer, data15, addCounter15, 15);
+                        }
+                    }
+                    if (addBuffer16) {
+                        if (i == 0)//actually should be 37220, but i is always a multiple of bufferlength, which is 100.Fun fact : there is an asteroid called 18610 ArthurDent.
+                        {
+                            Log.d(TAG, "Letting tracks in.");
+                            letIn16 = true;
+                        }
+                        if (letIn16) {
+                            temp = addToSoundArray(temp, resultingBuffer, data16, addCounter16, 16);
+                        }
+                    }
+                    if (addBuffer17) {
+                        temp = addPlayOnceToSoundArray(temp, resultingBuffer, data17, addCounter17, 17);
+                    }
+                    if (addBuffer18) {
+                        temp = addPlayOnceToSoundArray(temp, resultingBuffer, data18, addCounter18, 18);
+                    }
+                    if (addBuffer19) {
+                        temp = addPlayOnceToSoundArray(temp, resultingBuffer, data19, addCounter19, 19);
+                    }
+                    if (addBuffer20) {
+                        temp = addPlayOnceToSoundArray(temp, resultingBuffer, data20, addCounter20, 20);
+                    }
+                    if (addBuffer21) {
+                        temp = addPlayOnceToSoundArray(temp, resultingBuffer, data21, addCounter21, 21);
+                    }
+                    if (addBuffer22) {
+                        temp = addPlayOnceToSoundArray(temp, resultingBuffer, data22, addCounter22, 22);
+                    }
+                    if (addBuffer23) {
+                        temp = addPlayOnceToSoundArray(temp, resultingBuffer, data23, addCounter23, 23);
+                    }
+                    if (addBuffer24) {
+                        temp = addPlayOnceToSoundArray(temp, resultingBuffer, data24, addCounter24, 24);
+                    }
+
+
+                    // Log.d(TAG,"writing to audioTrack");
+                    //  Log.d(TAG,"this is i: "+i+"");
+                    if (!m_stop) {
+                        try {
+                            m_audioTrack.write(temp, 0, temp.length);//To register changes faster, try writing shorter parts at a time.
+                        } catch (Exception e)
+                        {
+                            throw e;
+                        }
+                    }
+                    i = i + bufferLength;
+                    wavCounter++;
+                    if (i > outputBuffer.length - bufferLength)
                     {
-                        temp = addToSoundArray(temp,resultingBuffer,data5,addCounter5,5);
+                        i = 0;
+                    }
+                    if (stopStream)
+                    {
+                        m_stop = true;
+                        Log.d(TAG, "Calling m_stop");
+                        m_audioTrack.stop();
+                        Log.d(TAG, "Stopping AudioTrack");
+                        m_audioTrack.release();
+                        Log.d(TAG, "Releasing AudioTrack.");
+                        i = 0;
                     }
                 }
                 //
-                if(addBuffer6)
+                else if(quality==22)
                 {
-                    if(i==0)//actually should be 37220, but i is always a multiple of bufferlength, which is 100.Fun fact : there is an asteroid called 18610 ArthurDent.
-                    {
-                        Log.d(TAG,"Letting tracks in.");
-                        letIn6=true;
-                    }
-                    if(letIn6)
-                    {
-                        temp = addToSoundArray(temp,resultingBuffer,data6,addCounter6,6);
-                    }
-                }
+                    Log.d(TAG, "Letting tracks in.");
 
-                if(addBuffer7)
-                {
-                    if(i==0)//actually should be 37220, but i is always a multiple of bufferlength, which is 100.Fun fact : there is an asteroid called 18610 ArthurDent.
-                    {
-                        Log.d(TAG,"Letting tracks in.");
-                        letIn7=true;
-                    }
-                    if(letIn7)
-                    {
-                        temp = addToSoundArray(temp,resultingBuffer,data7,addCounter7,7);
-                    }
-                }
-                if(addBuffer8)
-                {
-                    if(i==0)//actually should be 37220, but i is always a multiple of bufferlength, which is 100.Fun fact : there is an asteroid called 18610 ArthurDent.
-                    {
-                        Log.d(TAG,"Letting tracks in.");
-                        letIn8=true;
-                    }
-                    if(letIn8)
-                    {
-                        temp = addToSoundArray(temp,resultingBuffer,data8,addCounter8,8);
-                    }
-                }
-                if(addBuffer9)
-                {
-                    if(i==0)//actually should be 37220, but i is always a multiple of bufferlength, which is 100.Fun fact : there is an asteroid called 18610 ArthurDent.
-                    {
-                        Log.d(TAG,"Letting tracks in.");
-                        letIn9=true;
-                    }
-                    if(letIn9)
-                    {
-                        temp = addToSoundArray(temp,resultingBuffer,data9,addCounter9,9);
-                    }
-                }
-                //
-                if(addBuffer10)
-                {
-                    if(i==0)//actually should be 37220, but i is always a multiple of bufferlength, which is 100.Fun fact : there is an asteroid called 18610 ArthurDent.
-                    {
-                        Log.d(TAG,"Letting tracks in.");
-                        letIn10=true;
-                    }
-                    if(letIn10)
-                    {
-                        temp = addToSoundArray(temp,resultingBuffer,data10,addCounter10,10);
-                    }
-                }
-                //
-                if(addBuffer11)
-                {
-                    if(i==0)//actually should be 37220, but i is always a multiple of bufferlength, which is 100.Fun fact : there is an asteroid called 18610 ArthurDent.
-                    {
-                        Log.d(TAG,"Letting tracks in.");
-                        letIn11=true;
-                    }
-                    if(letIn11)
-                    {
-                        temp = addToSoundArray(temp,resultingBuffer,data11,addCounter11,11);
-                    }
-                }
-                if(addBuffer12)
-                {
-                    if(i==0)//actually should be 37220, but i is always a multiple of bufferlength, which is 100.Fun fact : there is an asteroid called 18610 ArthurDent.
-                    {
-                        Log.d(TAG,"Letting tracks in.");
-                        letIn12=true;
-                    }
-                    if(letIn12)
-                    {
-                        temp = addToSoundArray(temp,resultingBuffer,data12,addCounter12,12);
-                    }
-                }
-                if(addBuffer13)
-                {
-                    if(i==0)//actually should be 37220, but i is always a multiple of bufferlength, which is 100.Fun fact : there is an asteroid called 18610 ArthurDent.
-                    {
-                        Log.d(TAG,"Letting tracks in.");
-                        letIn13=true;
-                    }
-                    if(letIn13)
-                    {
-                        temp = addToSoundArray(temp,resultingBuffer,data13,addCounter13,13);
-                    }
-                }
-                if(addBuffer14)
-                {
-                    if(i==0)//actually should be 37220, but i is always a multiple of bufferlength, which is 100.Fun fact : there is an asteroid called 18610 ArthurDent.
-                    {
-                        Log.d(TAG,"Letting tracks in.");
-                        letIn14=true;
-                    }
-                    if(letIn14)
-                    {
-                        temp = addToSoundArray(temp,resultingBuffer,data14,addCounter14,14);
-                    }
-                }
-                if(addBuffer15)
-                {
-                    if(i==0)//actually should be 37220, but i is always a multiple of bufferlength, which is 100.Fun fact : there is an asteroid called 18610 ArthurDent.
-                    {
-                        Log.d(TAG,"Letting tracks in.");
-                        letIn15=true;
-                    }
-                    if(letIn15)
-                    {
-                        temp = addToSoundArray(temp,resultingBuffer,data15,addCounter15,15);
-                    }
-                }
-                if(addBuffer16)
-                {
-                    if(i==0)//actually should be 37220, but i is always a multiple of bufferlength, which is 100.Fun fact : there is an asteroid called 18610 ArthurDent.
-                    {
-                        Log.d(TAG,"Letting tracks in.");
-                        letIn16=true;
-                    }
-                    if(letIn16)
-                    {
-                        temp = addToSoundArray(temp,resultingBuffer,data16,addCounter16,16);
-                    }
-                }
-                if(addBuffer17)
-                {
-                    temp=addPlayOnceToSoundArray(temp,resultingBuffer,data17,addCounter17,17);
-                }
-                if(addBuffer18)
-                {
-                    temp=addPlayOnceToSoundArray(temp,resultingBuffer,data18,addCounter18,18);
-                }
-                if(addBuffer19)
-                {
-                    temp=addPlayOnceToSoundArray(temp,resultingBuffer,data19,addCounter19,19);
-                }
-                if(addBuffer20)
-                {
-                    temp=addPlayOnceToSoundArray(temp,resultingBuffer,data20,addCounter20,20);
-                }
-                if(addBuffer21)
-                {
-                    temp=addPlayOnceToSoundArray(temp,resultingBuffer,data21,addCounter21,21);
-                }
-                if(addBuffer22) {
-                    temp=addPlayOnceToSoundArray(temp,resultingBuffer,data22,addCounter22,22);
-                }
-                if(addBuffer23)
-                {
-                    temp=addPlayOnceToSoundArray(temp,resultingBuffer,data23,addCounter23,23);
-                }
-                if(addBuffer24)
-                {
-                    temp=addPlayOnceToSoundArray(temp,resultingBuffer,data24,addCounter24,24);
-                }
+                    //Should store a files about twice per second.
+                    //Uncomment to store wav files for debug:
 
-               // Log.d(TAG,"writing to audioTrack");
-              //  Log.d(TAG,"this is i: "+i+"");
-                if(!m_stop) {
-                    try {
-                        m_audioTrack.write(temp, 0, temp.length);//To register changes faster, try writing shorter parts at a time.
-                    } catch (Exception e) {
-                        throw e;
+                /*
+                if(wavCounter>2000)
+                {
+                    saveToWav(testBuffer,wavFileNumber);
+                    wavCounter=0;
+                }*/
+                    //temp is the array that we write to audiotrack and which contains the amplitudes of all the active audiotracks summed together.
+                    //resultingBuffer[] is emptied and refilled for each active track and added to temp[].
+                    byte[] temp = new byte[bufferLength];
+                    byte[] resultingBuffer = new byte[temp.length];
+                    if (addBuffer1) {
+                        if (i == 0)//Letting tracks in at zero.
+                        {
+                            Log.d(TAG, "Letting tracks in.");
+                            letIn1 = true;
+                        } else if (numberOfStreams - numberOfLiveTracks == 0)
+                        {
+                            //should start immediately, but don't know how to do this yet.
+                        }
+                        if (letIn1) {
+                            temp = addToSoundArray(temp, resultingBuffer, data1_22, addCounter1, 1);
+                        }
                     }
-                }
-                i=i+bufferLength;
-                wavCounter++;
-                if(i>outputBuffer.length-bufferLength)
-                {
-                    i=0;
-                }
-                if(stopStream)
-                {
-                    m_stop = true;
-                    Log.d(TAG,"Calling m_stop");
-                    m_audioTrack.stop();
-                    Log.d(TAG,"Stopping AudioTrack");
-                    m_audioTrack.release();
-                    Log.d(TAG,"Releasing AudioTrack.");
-                    i=0;
+
+                    if (addBuffer2) {
+                        if (i == 0)//actually should be 37220, but i is always a multiple of bufferlength, which is 100.Fun fact : there is an asteroid called 18610 ArthurDent.
+                        {
+                            Log.d(TAG, "Letting tracks in.");
+                            letIn2 = true;
+                        }
+                        if (letIn2) {
+                            temp = addToSoundArray(temp, resultingBuffer, data2_22, addCounter2, 2);
+                        }
+                    }
+                    if (addBuffer3) {
+                        if (i == 0)//actually should be 37220, but i is always a multiple of bufferlength, which is 100.Fun fact : there is an asteroid called 18610 ArthurDent.
+                        {
+                            Log.d(TAG, "Letting tracks in.");
+                            letIn3 = true;
+                        }
+                        if (letIn3) {
+                            temp = addToSoundArray(temp, resultingBuffer, data3_22, addCounter3, 3);
+                        }
+                    }
+                    if (addBuffer4) {
+                        if (i == 0)//actually should be 37220, but i is always a multiple of bufferlength, which is 100.Fun fact : there is an asteroid called 18610 ArthurDent.
+                        {
+                            Log.d(TAG, "Letting tracks in.");
+                            letIn4 = true;
+                        }
+                        if (letIn4) {
+                            temp = addToSoundArray(temp, resultingBuffer, data4_22, addCounter4, 4);
+                        }
+                    }
+                    if (addBuffer5) {
+                        if (i == 0)//actually should be 37220, but i is always a multiple of bufferlength, which is 100.Fun fact : there is an asteroid called 18610 ArthurDent.
+                        {
+                            Log.d(TAG, "Letting tracks in.");
+                            letIn5 = true;
+                        }
+                        if (letIn5) {
+                            temp = addToSoundArray(temp, resultingBuffer, data5_22, addCounter5, 5);
+                        }
+                    }
+                    //
+                    if (addBuffer6) {
+                        if (i == 0)//actually should be 37220, but i is always a multiple of bufferlength, which is 100.Fun fact : there is an asteroid called 18610 ArthurDent.
+                        {
+                            Log.d(TAG, "Letting tracks in.");
+                            letIn6 = true;
+                        }
+                        if (letIn6) {
+                            temp = addToSoundArray(temp, resultingBuffer, data6_22, addCounter6, 6);
+                        }
+                    }
+
+                    if (addBuffer7) {
+                        if (i == 0)//actually should be 37220, but i is always a multiple of bufferlength, which is 100.Fun fact : there is an asteroid called 18610 ArthurDent.
+                        {
+                            Log.d(TAG, "Letting tracks in.");
+                            letIn7 = true;
+                        }
+                        if (letIn7) {
+                            temp = addToSoundArray(temp, resultingBuffer, data7_22, addCounter7, 7);
+                        }
+                    }
+                    if (addBuffer8) {
+                        if (i == 0)//actually should be 37220, but i is always a multiple of bufferlength, which is 100.Fun fact : there is an asteroid called 18610 ArthurDent.
+                        {
+                            Log.d(TAG, "Letting tracks in.");
+                            letIn8 = true;
+                        }
+                        if (letIn8) {
+                            temp = addToSoundArray(temp, resultingBuffer, data8_22, addCounter8, 8);
+                        }
+                    }
+                    if (addBuffer9) {
+                        if (i == 0)//actually should be 37220, but i is always a multiple of bufferlength, which is 100.Fun fact : there is an asteroid called 18610 ArthurDent.
+                        {
+                            Log.d(TAG, "Letting tracks in.");
+                            letIn9 = true;
+                        }
+                        if (letIn9) {
+                            temp = addToSoundArray(temp, resultingBuffer, data9_22, addCounter9, 9);
+                        }
+                    }
+                    //
+                    if (addBuffer10) {
+                        if (i == 0)//actually should be 37220, but i is always a multiple of bufferlength, which is 100.Fun fact : there is an asteroid called 18610 ArthurDent.
+                        {
+                            Log.d(TAG, "Letting tracks in.");
+                            letIn10 = true;
+                        }
+                        if (letIn10) {
+                            temp = addToSoundArray(temp, resultingBuffer, data10_22, addCounter10, 10);
+                        }
+                    }
+                    //
+                    if (addBuffer11) {
+                        if (i == 0)//actually should be 37220, but i is always a multiple of bufferlength, which is 100.Fun fact : there is an asteroid called 18610 ArthurDent.
+                        {
+                            Log.d(TAG, "Letting tracks in.");
+                            letIn11 = true;
+                        }
+                        if (letIn11) {
+                            temp = addToSoundArray(temp, resultingBuffer, data11_22, addCounter11, 11);
+                        }
+                    }
+                    if (addBuffer12) {
+                        if (i == 0)//actually should be 37220, but i is always a multiple of bufferlength, which is 100.Fun fact : there is an asteroid called 18610 ArthurDent.
+                        {
+                            Log.d(TAG, "Letting tracks in.");
+                            letIn12 = true;
+                        }
+                        if (letIn12) {
+                            temp = addToSoundArray(temp, resultingBuffer, data12_22, addCounter12, 12);
+                        }
+                    }
+                    if (addBuffer13) {
+                        if (i == 0)//actually should be 37220, but i is always a multiple of bufferlength, which is 100.Fun fact : there is an asteroid called 18610 ArthurDent.
+                        {
+                            Log.d(TAG, "Letting tracks in.");
+                            letIn13 = true;
+                        }
+                        if (letIn13) {
+                            temp = addToSoundArray(temp, resultingBuffer, data13_22, addCounter13, 13);
+                        }
+                    }
+                    if (addBuffer14) {
+                        if (i == 0)//actually should be 37220, but i is always a multiple of bufferlength, which is 100.Fun fact : there is an asteroid called 18610 ArthurDent.
+                        {
+                            Log.d(TAG, "Letting tracks in.");
+                            letIn14 = true;
+                        }
+                        if (letIn14) {
+                            temp = addToSoundArray(temp, resultingBuffer, data14_22, addCounter14, 14);
+                        }
+                    }
+                    if (addBuffer15) {
+                        if (i == 0)//actually should be 37220, but i is always a multiple of bufferlength, which is 100.Fun fact : there is an asteroid called 18610 ArthurDent.
+                        {
+                            Log.d(TAG, "Letting tracks in.");
+                            letIn15 = true;
+                        }
+                        if (letIn15) {
+                            temp = addToSoundArray(temp, resultingBuffer, data15_22, addCounter15, 15);
+                        }
+                    }
+                    if (addBuffer16) {
+                        if (i == 0)//actually should be 37220, but i is always a multiple of bufferlength, which is 100.Fun fact : there is an asteroid called 18610 ArthurDent.
+                        {
+                            Log.d(TAG, "Letting tracks in.");
+                            letIn16 = true;
+                        }
+                        if (letIn16) {
+                            temp = addToSoundArray(temp, resultingBuffer, data16_22, addCounter16, 16);
+                        }
+                    }
+                    if (addBuffer17) {
+                        temp = addPlayOnceToSoundArray(temp, resultingBuffer, data17_22, addCounter17, 17);
+                    }
+                    if (addBuffer18) {
+                        temp = addPlayOnceToSoundArray(temp, resultingBuffer, data18_22, addCounter18, 18);
+                    }
+                    if (addBuffer19) {
+                        temp = addPlayOnceToSoundArray(temp, resultingBuffer, data19_22, addCounter19, 19);
+                    }
+                    if (addBuffer20) {
+                        temp = addPlayOnceToSoundArray(temp, resultingBuffer, data20_22, addCounter20, 20);
+                    }
+                    if (addBuffer21) {
+                        temp = addPlayOnceToSoundArray(temp, resultingBuffer, data21_22, addCounter21, 21);
+                    }
+                    if (addBuffer22) {
+                        temp = addPlayOnceToSoundArray(temp, resultingBuffer, data22_22, addCounter22, 22);
+                    }
+                    if (addBuffer23) {
+                        temp = addPlayOnceToSoundArray(temp, resultingBuffer, data23_22, addCounter23, 23);
+                    }
+                    if (addBuffer24) {
+                        temp = addPlayOnceToSoundArray(temp, resultingBuffer, data24_22, addCounter24, 24);
+                    }
+
+
+                    // Log.d(TAG,"writing to audioTrack");
+                    //  Log.d(TAG,"this is i: "+i+"");
+                    if (!m_stop) {
+                        try {
+                            m_audioTrack_22.write(temp, 0, temp.length);//To register changes faster, try writing shorter parts at a time.
+                        } catch (Exception e) {
+                            throw e;
+                        }
+                    }
+                    i = i + bufferLength;
+                    wavCounter++;
+                    if (i > outputBuffer.length - bufferLength)
+                    {
+                        i = 0;
+                    }
+                    if (stopStream) {
+                        m_stop = true;
+                        Log.d(TAG, "Calling m_stop");
+                        m_audioTrack_22.stop();
+                        Log.d(TAG, "Stopping AudioTrack");
+                        m_audioTrack_22.release();
+                        Log.d(TAG, "Releasing AudioTrack.");
+                        i = 0;
+                    }
                 }
             }
+            //
+
         }
     };
     @Override
@@ -801,14 +1036,16 @@ public class MainActivity extends Activity {
         AppRater.app_launched(this);
         try
         {
-            fillAllBuffers();//Load data7, data8, data9.
+            fillAllBuffers(quality);//Load data7, data8, data9.
            // bufferLength=data7.length;
         }
         catch (Exception e){}
         //Start: applies to activity_main3.xml
         rateButton = (Button) findViewById(R.id.rateButton);
         infoButton = (Button) findViewById(R.id.infoButton);
-        qualityButton = (ImageButton) findViewById(R.id.qualityButton);
+/*Uncomment to add choice of changing quality - this does not work yet.*
+
+        qualityButton = (ImageButton) findViewById(R.id.qualityButton);*/
         b1 = (ImageButton) findViewById(R.id.buttonOne);
         b2 = (ImageButton) findViewById(R.id.buttonTwo);
         b3 = (ImageButton) findViewById(R.id.buttonThree);
@@ -882,7 +1119,8 @@ public class MainActivity extends Activity {
         int topPanel = (int)squareSide/2;
         rateButton.setLayoutParams(new LinearLayout.LayoutParams(topPanel,topPanel));
         infoButton.setLayoutParams(new LinearLayout.LayoutParams(topPanel,topPanel));
-        qualityButton.setLayoutParams(new LinearLayout.LayoutParams(topPanel*2,topPanel));
+        /*Uncomment to add choice of changing quality - this does not work yet.
+        qualityButton.setLayoutParams(new LinearLayout.LayoutParams(topPanel*2,topPanel));*/
         b1.setLayoutParams(new LinearLayout.LayoutParams(squareSide,squareSide));
         b2.setLayoutParams(new LinearLayout.LayoutParams(squareSide,squareSide));
         b3.setLayoutParams(new LinearLayout.LayoutParams(squareSide,squareSide));
@@ -1004,8 +1242,7 @@ public class MainActivity extends Activity {
                   TextView text = (TextView)layout.findViewById(R.id.text);
                   text.setTextColor(Color.BLACK);
                   text.setText(Html.fromHtml("<b>If you experience problems with audio crackle it is probably due to high load on your cpu.</b>" +
-                          "There are two solutions to this - either do not run as many applications in the background or lower the quality of the audio files from" +
-                          "44.1 Hz to something else using the button in the top panel. This project is open source and released under" +
+                          "A possible solution to this is to not run as many service processes, such as downloading stuff or running a music player in the background (doh, please don't do this anyway ;)). This project is open source and released under" +
                           "<a href=https://www.gnu.org/licenses/gpl.html> GPL v3</a>. You can view the source code on <a href=https://github.com/gnyrfta/AudioTrackLooper> Github</a>.\n" +
                           "The software is created by <a href=http://www.gnyrftacode.se>David Jacobsson</a> and the audio tracks by" +
                           "<a href=https://henrikjacobsson.com> Henrik Jacobsson</a>." +
@@ -1045,6 +1282,7 @@ public class MainActivity extends Activity {
               }
             }
         });
+
         rateButton.setOnClickListener(new View.OnClickListener() {
             public void onClick(View v)
             {
@@ -1066,6 +1304,98 @@ public class MainActivity extends Activity {
                 }
             }
         });
+        /*
+        qualityButton.setOnClickListener(new View.OnClickListener() {
+            public void onClick(View v)
+            {
+                Log.d(TAG,"Clicked quality");
+                try
+                {
+                    AlertDialog.Builder builder = new AlertDialog.Builder(MainActivity.this);
+                    builder.setTitle("Set sampling rate");
+                    LayoutInflater inflater = (LayoutInflater)MainActivity.this.getSystemService(LAYOUT_INFLATER_SERVICE);
+                    View layout = inflater.inflate(R.layout.radio_button_dialog,null);
+                    RadioButton fortyFour = (RadioButton)layout.findViewById(R.id.radio_44);
+                    final RadioButton twentyTwo = (RadioButton)layout.findViewById(R.id.radio_22);
+                    RadioGroup rg = (RadioGroup)layout.findViewById(R.id.chooser_sampling_rate);
+                    fortyFour.setOnClickListener(new View.OnClickListener(){
+                        public void onClick(View v)
+                        {
+                            try
+                            {
+                                if(!fortyFourFilled)
+                                {
+                                    fillAllBuffers(quality);
+                                    m_stop = true;
+                                    Log.d(TAG, "Calling m_stop");
+                                    m_audioTrack.stop();
+                                    Log.d(TAG, "Stopping AudioTrack");
+                                    m_audioTrack.release();
+                                    Log.d(TAG, "Releasing AudioTrack.");
+                                    i = 0;
+                                    quality=44;
+                                    //Set boolean looper to stop.
+                                    //stop and release AudioTrackLooper
+                                }
+                            }
+                            catch(Exception e){}
+                            Toast.makeText(MainActivity.this,"Sampling rate 44.1 khz.",Toast.LENGTH_SHORT).show();
+                        }
+                    });
+                    twentyTwo.setOnClickListener(new View.OnClickListener(){
+                        public void onClick(View v)
+                        {
+                            try
+                            {
+                                if(!twentyTwoFilled)
+                                {
+                                    fillAllBuffers(quality);
+                                    m_stop = true;
+                                    Log.d(TAG, "Calling m_stop");
+                                    m_audioTrack.stop();
+                                    Log.d(TAG, "Stopping AudioTrack");
+                                    m_audioTrack.release();
+                                    Log.d(TAG, "Releasing AudioTrack.");
+                                    i = 0;
+                                    quality=22;
+                                    //initialize other audiotrack set m_stop=false send the sum of all the data files to
+                                    //the other audio track.
+                                }
+                            }
+                            catch (Exception e){}
+                            Toast.makeText(MainActivity.this,"Sampling rate 22.05 khz.",Toast.LENGTH_SHORT).show();
+                        }
+                    });
+                            rg.setOnCheckedChangeListener(new RadioGroup.OnCheckedChangeListener() {
+
+                                @Override
+                                public void onCheckedChanged(RadioGroup group, int checkedId) {
+                                    Log.d("chk", "id" + checkedId);
+
+                                    if (checkedId == R.id.radio_22) {
+                                        Toast.makeText(MainActivity.this,"Sampling rate 22.05 khz.",Toast.LENGTH_LONG).show();
+                                    } else if (checkedId == R.id.radio_44) {
+                                        //some code
+                                    }
+
+                                }
+
+                            });
+
+                    builder.setView(layout);
+                    AlertDialog alert = builder.show();
+                    // text.setMovementMethod(LinkMovementMethod.getInstance());
+
+                    //TextView msgTxt = (TextView) alertDialog.findViewById(android.R.id.message);
+                    //msgTxt.setMovementMethod(LinkMovementMethod.getInstance());
+                }
+                catch (Exception e)
+                {
+                    throw new RuntimeException(e);
+                }
+            }
+        });
+        */
         b1.setOnClickListener(new View.OnClickListener() {
             public void onClick(View v) {
                 try {
@@ -1077,7 +1407,7 @@ public class MainActivity extends Activity {
                             stopStream=false;
                             numberOfStreams += 1.0;
                             addBuffer1 = true;
-                            startStreaming();
+                            startStreaming(44);
                             ((ImageButton) findViewById(R.id.buttonOne)).setImageDrawable(greenButtonLightOn);
                         }
                         else
@@ -1134,7 +1464,7 @@ public class MainActivity extends Activity {
                             numberOfStreams += 1.0;
                             addBuffer2 = true;
                             ((ImageButton) findViewById(R.id.buttonTwo)).setImageDrawable(greenButtonLightOn);
-                            startStreaming();
+                            startStreaming(44);
                         } else {
                             numberOfStreams += 1.0;
                             addBuffer2 = true;
@@ -1188,7 +1518,7 @@ public class MainActivity extends Activity {
                             stopStream=false;
                             numberOfStreams += 1.0;
                             addBuffer3 = true;
-                            startStreaming();
+                            startStreaming(44);
                             ((ImageButton) findViewById(R.id.buttonThree)).setImageDrawable(greenButtonLightOn);
                         } else {
                             numberOfStreams += 1.0;
@@ -1243,7 +1573,7 @@ public class MainActivity extends Activity {
                             stopStream=false;
                             numberOfStreams += 1.0;
                             addBuffer4 = true;
-                            startStreaming();
+                            startStreaming(44);
                         } else {
                             numberOfStreams += 1.0;
                             addBuffer4 = true;
@@ -1296,7 +1626,7 @@ public class MainActivity extends Activity {
                             stopStream=false;
                             numberOfStreams += 1.0;
                             addBuffer5 = true;
-                            startStreaming();
+                            startStreaming(44);
                         } else {
                             numberOfStreams += 1.0;
                             addBuffer5 = true;
@@ -1349,7 +1679,7 @@ public class MainActivity extends Activity {
                             stopStream=false;
                             numberOfStreams += 1.0;
                             addBuffer6 = true;
-                            startStreaming();
+                            startStreaming(44);
                         } else {
                             numberOfStreams += 1.0;
                             addBuffer6 = true;
@@ -1403,7 +1733,7 @@ public class MainActivity extends Activity {
                             stopStream=false;
                             numberOfStreams += 1.0;
                             addBuffer7 = true;
-                            startStreaming();
+                            startStreaming(44);
                         }
                         else
                         {
@@ -1459,7 +1789,7 @@ public class MainActivity extends Activity {
                             stopStream=false;
                             numberOfStreams += 1.0;
                             addBuffer8 = true;
-                            startStreaming();
+                            startStreaming(44);
                         } else {
                             numberOfStreams += 1.0;
                             addBuffer8 = true;
@@ -1512,7 +1842,7 @@ public class MainActivity extends Activity {
                             stopStream=false;
                             numberOfStreams += 1.0;
                             addBuffer9 = true;
-                            startStreaming();
+                            startStreaming(44);
                         } else {
                             numberOfStreams += 1.0;
                             addBuffer9 = true;
@@ -1564,7 +1894,7 @@ public class MainActivity extends Activity {
                             stopStream=false;
                             numberOfStreams += 1.0;
                             addBuffer10 = true;
-                            startStreaming();
+                            startStreaming(44);
                         } else {
                             numberOfStreams += 1.0;
                             addBuffer10 = true;
@@ -1616,7 +1946,7 @@ public class MainActivity extends Activity {
                             stopStream=false;
                             numberOfStreams += 1.0;
                             addBuffer11 = true;
-                            startStreaming();
+                            startStreaming(44);
                         } else {
                             numberOfStreams += 1.0;
                             addBuffer11 = true;
@@ -1671,7 +2001,7 @@ public class MainActivity extends Activity {
                             stopStream=false;
                             numberOfStreams += 1.0;
                             addBuffer12 = true;
-                            startStreaming();
+                            startStreaming(44);
                         } else {
                             numberOfStreams += 1.0;
                             addBuffer12 = true;
@@ -1725,7 +2055,7 @@ public class MainActivity extends Activity {
                             stopStream=false;
                             numberOfStreams += 1.0;
                             addBuffer13 = true;
-                            startStreaming();
+                            startStreaming(44);
                         } else {
                             numberOfStreams += 1.0;
                             addBuffer13 = true;
@@ -1778,7 +2108,7 @@ public class MainActivity extends Activity {
                             stopStream=false;
                             numberOfStreams += 1.0;
                             addBuffer14 = true;
-                            startStreaming();
+                            startStreaming(44);
                         } else {
                             numberOfStreams += 1.0;
                             addBuffer14 = true;
@@ -1832,7 +2162,7 @@ public class MainActivity extends Activity {
                             stopStream=false;
                             numberOfStreams += 1.0;
                             addBuffer15 = true;
-                            startStreaming();
+                            startStreaming(44);
                         } else {
                             numberOfStreams += 1.0;
                             addBuffer15 = true;
@@ -1887,7 +2217,7 @@ public class MainActivity extends Activity {
                             stopStream=false;
                             numberOfStreams += 1.0;
                             addBuffer16 = true;
-                            startStreaming();
+                            startStreaming(44);
                         }
                         else
                         {
@@ -2071,7 +2401,7 @@ public class MainActivity extends Activity {
                             stopStream=false;
                             numberOfStreams += 1.0;
                             numberOfLiveTracks+=1.0;
-                            startStreaming();
+                            startStreaming(44);
                         }
                         else
                         {
@@ -2110,7 +2440,7 @@ public class MainActivity extends Activity {
                         {
                             stopStream=false;
                             numberOfStreams += 1.0;
-                            startStreaming();
+                            startStreaming(44);
                         }
                         else
                         {
@@ -2147,7 +2477,7 @@ public class MainActivity extends Activity {
                         {
                             stopStream=false;
                             numberOfStreams += 1.0;
-                            startStreaming();
+                            startStreaming(44);
                         }
                         else
                         {
@@ -2182,7 +2512,7 @@ public class MainActivity extends Activity {
                         if (numberOfStreams == 0) {
                             stopStream=false;
                             numberOfStreams += 1.0;
-                            startStreaming();
+                            startStreaming(44);
                         } else {
                             numberOfStreams += 1.0;
                         }
@@ -2217,7 +2547,7 @@ public class MainActivity extends Activity {
                         if (numberOfStreams == 0) {
                             stopStream=false;
                             numberOfStreams += 1.0;
-                            startStreaming();
+                            startStreaming(44);
                         } else {
                             numberOfStreams += 1.0;
                         }
@@ -2253,7 +2583,7 @@ public class MainActivity extends Activity {
                         if (numberOfStreams == 0) {
                             stopStream=false;
                             numberOfStreams += 1.0;
-                            startStreaming();
+                            startStreaming(44);
                         } else {
                             numberOfStreams += 1.0;
                         }
@@ -2289,7 +2619,7 @@ public class MainActivity extends Activity {
                         if (numberOfStreams == 0) {
                             stopStream=false;
                             numberOfStreams += 1.0;
-                            startStreaming();
+                            startStreaming(44);
                         } else {
                             numberOfStreams += 1.0;
                         }
@@ -2325,7 +2655,7 @@ public class MainActivity extends Activity {
                         if (numberOfStreams == 0) {
                             stopStream=false;
                             numberOfStreams += 1.0;
-                            startStreaming();
+                            startStreaming(44);
                         } else {
                             numberOfStreams += 1.0;
                         }
@@ -2953,7 +3283,7 @@ public class MainActivity extends Activity {
             m_audioTrack.setStereoVolume(0,0);
         }
     }
-    void startStreaming()
+    void startStreaming(int mquality)
     {
         int STREAM_MUSIC = 3;
         int ENCODING_PCM_16BIT = 2;
@@ -2970,16 +3300,29 @@ public class MainActivity extends Activity {
             data2 = new byte[dataSize];
             is.read(data2, 0, data2.length);
             is.close();*/
-            outputBuffer = data2;
-            int frames = data2.length / 2; //2 bytes per frame.*/
-            m_stop = false;
-            m_audioTrack = new AudioTrack(AudioManager.STREAM_MUSIC, 44100, AudioFormat.CHANNEL_OUT_MONO,
-                    AudioFormat.ENCODING_PCM_16BIT, bufferLength,
-                    AudioTrack.MODE_STREAM);//100 is hardcoded buffer size in bytes. 'datasize' is size of sample.
-            m_audioTrack.play();
-            audioTrackThread = new Thread(feedToBuffer);
-            audioTrackThread.start();
-            audioTrackCreated=true;
+            if(mquality==44)
+            {
+                outputBuffer = data2;
+                int frames = data2.length / 2; //2 bytes per frame.*/
+                m_stop = false;
+                m_audioTrack = new AudioTrack(AudioManager.STREAM_MUSIC, 44100, AudioFormat.CHANNEL_OUT_MONO,
+                        AudioFormat.ENCODING_PCM_16BIT, bufferLength,
+                        AudioTrack.MODE_STREAM);//100 is hardcoded buffer size in bytes. 'datasize' is size of sample.
+                m_audioTrack.play();
+                audioTrackThread = new Thread(feedToBuffer);
+                audioTrackThread.start();
+                audioTrackCreated = true;
+            }
+            else if(mquality==22)
+            {
+                outputBuffer = data2_22;
+                int frames = data2_22.length / 2; //2 bytes per frame.*/
+                m_stop = false;
+                m_audioTrack_22 = new AudioTrack(AudioManager.STREAM_MUSIC, 22050, AudioFormat.CHANNEL_OUT_MONO,
+                        AudioFormat.ENCODING_PCM_16BIT, bufferLength,
+                        AudioTrack.MODE_STREAM);//100 is hardcoded buffer size in bytes. 'datasize' is size of sample.
+                m_audioTrack_22.play();
+            }
         }
         catch (Exception e)
         {
@@ -2999,7 +3342,7 @@ public class MainActivity extends Activity {
      }
     }*/
     //This should be called in onCreate.
-    boolean fillAllBuffers() throws IOException
+    boolean fillAllBuffers(int mquality) throws IOException
     {
         Log.d(TAG+"fill","Entering fill all buffers");
         int STREAM_MUSIC = 3;
@@ -3007,191 +3350,384 @@ public class MainActivity extends Activity {
         int CHANNEL_OUT_MONO = 4;
         int MODE_STATIC = 0;
         int MODE_STREAM = 1;
-        try {
-            Log.d(TAG+"loading","Starting to load #1");
-            WavInfo wi1 = new WavInfo();
-            Log.d(TAG+"loading","Attempting to get resource");
-            InputStream is1 = getResources().openRawResource(R.raw.beat1);
-            Log.d(TAG+"loading","Got resource, attempting header");
-            dataSize1 = wi1.readHeader(is1);
-            Log.d(TAG+"loading","Read header, attempting to read resource to byte buffer.");
-            data1 = new byte[dataSize1];
-            is1.read(data1, 0, data1.length);
-            is1.close();
-            Log.d(TAG+"loading","Finished loading #1");
+        if(mquality==44)
+        {
+            try {
+                Log.d(TAG + "loading", "Starting to load #1");
+                WavInfo wi1 = new WavInfo();
+                Log.d(TAG + "loading", "Attempting to get resource");
+                InputStream is1 = getResources().openRawResource(R.raw.beat1);
+                Log.d(TAG + "loading", "Got resource, attempting header");
+                dataSize1 = wi1.readHeader(is1);
+                Log.d(TAG + "loading", "Read header, attempting to read resource to byte buffer.");
+                data1 = new byte[dataSize1];
+                is1.read(data1, 0, data1.length);
+                is1.close();
+                Log.d(TAG + "loading", "Finished loading #1");
 //1,2,3,13,15,16 drums.
-            Log.d(TAG+"loading","Starting to load #2");
-            WavInfo wi2 = new WavInfo();
-            Log.d(TAG+"loading","Attempting to get resource");
-            InputStream is2 = getResources().openRawResource(R.raw.beat3);
-            Log.d(TAG+"loading","Got resource, attempting header");
-            dataSize2 = wi2.readHeader(is2);
-            Log.d(TAG+"loading","Read header, attempting to read resource to byte buffer.");
-            data2 = new byte[dataSize2];
-            is2.read(data2, 0, data2.length);
-            is2.close();
-            Log.d(TAG+"loading","Finished loading #2");
-            Log.d(TAG+"loading","Starting loading #3");
-            //
-            WavInfo wi3 = new WavInfo();
-            InputStream is3 = getResources().openRawResource(R.raw.hihat);
-            dataSize3 = wi3.readHeader(is3);
-            data3 = new byte[dataSize3];
-            is3.read(data3, 0, data3.length);
-            is3.close();
-            Log.d(TAG+"loading","Starting loading #4");
-            //
-            WavInfo wi4 = new WavInfo();
-            InputStream is4 = getResources().openRawResource(R.raw.hey_hey_hey);
-            dataSize4 = wi4.readHeader(is4);
-            data4 = new byte[dataSize4];
-            is4.read(data4, 0, data4.length);
-            is4.close();
+                Log.d(TAG + "loading", "Starting to load #2");
+                WavInfo wi2 = new WavInfo();
+                Log.d(TAG + "loading", "Attempting to get resource");
+                InputStream is2 = getResources().openRawResource(R.raw.beat3);
+                Log.d(TAG + "loading", "Got resource, attempting header");
+                dataSize2 = wi2.readHeader(is2);
+                Log.d(TAG + "loading", "Read header, attempting to read resource to byte buffer.");
+                data2 = new byte[dataSize2];
+                is2.read(data2, 0, data2.length);
+                is2.close();
+                Log.d(TAG + "loading", "Finished loading #2");
+                Log.d(TAG + "loading", "Starting loading #3");
+                //
+                WavInfo wi3 = new WavInfo();
+                InputStream is3 = getResources().openRawResource(R.raw.hihat);
+                dataSize3 = wi3.readHeader(is3);
+                data3 = new byte[dataSize3];
+                is3.read(data3, 0, data3.length);
+                is3.close();
+                Log.d(TAG + "loading", "Starting loading #4");
+                //
+                WavInfo wi4 = new WavInfo();
+                InputStream is4 = getResources().openRawResource(R.raw.hey_hey_hey);
+                dataSize4 = wi4.readHeader(is4);
+                data4 = new byte[dataSize4];
+                is4.read(data4, 0, data4.length);
+                is4.close();
 
-            WavInfo wi5 = new WavInfo();
-            InputStream is5 = getResources().openRawResource(R.raw.snare_filter);
-            dataSize5 = wi5.readHeader(is5);
-            data5 = new byte[dataSize5];
-            is5.read(data5, 0, data5.length);
-            is5.close();
+                WavInfo wi5 = new WavInfo();
+                InputStream is5 = getResources().openRawResource(R.raw.snare_filter);
+                dataSize5 = wi5.readHeader(is5);
+                data5 = new byte[dataSize5];
+                is5.read(data5, 0, data5.length);
+                is5.close();
 
-            WavInfo wi6 = new WavInfo();
-            InputStream is6 = getResources().openRawResource(R.raw.kick_snare_dope);
-            dataSize6 = wi6.readHeader(is6);
-            data6 = new byte[dataSize6];
-            is6.read(data6, 0, data6.length);
-            is6.close();
+                WavInfo wi6 = new WavInfo();
+                InputStream is6 = getResources().openRawResource(R.raw.kick_snare_dope);
+                dataSize6 = wi6.readHeader(is6);
+                data6 = new byte[dataSize6];
+                is6.read(data6, 0, data6.length);
+                is6.close();
 
-            WavInfo wi7 = new WavInfo();
-            InputStream is7 = getResources().openRawResource(R.raw.sub_bass1);
-            dataSize7 = wi7.readHeader(is7);
-            data7 = new byte[dataSize7];
-            is7.read(data7, 0, data7.length);
-            is7.close();
+                WavInfo wi7 = new WavInfo();
+                InputStream is7 = getResources().openRawResource(R.raw.sub_bass1);
+                dataSize7 = wi7.readHeader(is7);
+                data7 = new byte[dataSize7];
+                is7.read(data7, 0, data7.length);
+                is7.close();
 
-            WavInfo wi8 = new WavInfo();
-            InputStream is8 = getResources().openRawResource(R.raw.sub_bass2);
-            dataSize8 = wi8.readHeader(is8);
-            data8 = new byte[dataSize8];
-            is8.read(data8, 0, data8.length);
-            is8.close();
+                WavInfo wi8 = new WavInfo();
+                InputStream is8 = getResources().openRawResource(R.raw.sub_bass2);
+                dataSize8 = wi8.readHeader(is8);
+                data8 = new byte[dataSize8];
+                is8.read(data8, 0, data8.length);
+                is8.close();
 
-            WavInfo wi9 = new WavInfo();
-            InputStream is9 = getResources().openRawResource(R.raw.synth_bass);
-            dataSize9 = wi9.readHeader(is9);
-            data9 = new byte[dataSize9];
-            is9.read(data9, 0, data9.length);
-            is9.close();
+                WavInfo wi9 = new WavInfo();
+                InputStream is9 = getResources().openRawResource(R.raw.synth_bass);
+                dataSize9 = wi9.readHeader(is9);
+                data9 = new byte[dataSize9];
+                is9.read(data9, 0, data9.length);
+                is9.close();
 
-            WavInfo wi10 = new WavInfo();
-            InputStream is10 = getResources().openRawResource(R.raw.chords);
-            dataSize10 = wi10.readHeader(is10);
-            data10 = new byte[dataSize10];
-            is10.read(data10, 0, data10.length);
-            is10.close();
+                WavInfo wi10 = new WavInfo();
+                InputStream is10 = getResources().openRawResource(R.raw.chords);
+                dataSize10 = wi10.readHeader(is10);
+                data10 = new byte[dataSize10];
+                is10.read(data10, 0, data10.length);
+                is10.close();
 
-            WavInfo wi11 = new WavInfo();
-            InputStream is11 = getResources().openRawResource(R.raw.clarinet_chords);
-            dataSize11 = wi11.readHeader(is11);
-            data11 = new byte[dataSize11];
-            is11.read(data11, 0, data11.length);
-            is11.close();
+                WavInfo wi11 = new WavInfo();
+                InputStream is11 = getResources().openRawResource(R.raw.clarinet_chords);
+                dataSize11 = wi11.readHeader(is11);
+                data11 = new byte[dataSize11];
+                is11.read(data11, 0, data11.length);
+                is11.close();
 
-            WavInfo wi12 = new WavInfo();
-            InputStream is12 = getResources().openRawResource(R.raw.bright_strings);
-            dataSize12 = wi12.readHeader(is12);
-            data12 = new byte[dataSize12];
-            is12.read(data12, 0, data12.length);
-            is12.close();
+                WavInfo wi12 = new WavInfo();
+                InputStream is12 = getResources().openRawResource(R.raw.bright_strings);
+                dataSize12 = wi12.readHeader(is12);
+                data12 = new byte[dataSize12];
+                is12.read(data12, 0, data12.length);
+                is12.close();
 
-            WavInfo wi13 = new WavInfo();
-            InputStream is13 = getResources().openRawResource(R.raw.boxy_synth);//boxy
-            dataSize13 = wi13.readHeader(is13);
-            data13 = new byte[dataSize13];
-            is13.read(data13, 0, data13.length);
-            is13.close();
+                WavInfo wi13 = new WavInfo();
+                InputStream is13 = getResources().openRawResource(R.raw.boxy_synth);//boxy
+                dataSize13 = wi13.readHeader(is13);
+                data13 = new byte[dataSize13];
+                is13.read(data13, 0, data13.length);
+                is13.close();
 
-            WavInfo wi14 = new WavInfo();
-            InputStream is14 = getResources().openRawResource(R.raw.simple_comp);
-            dataSize14 = wi14.readHeader(is14);
-            data14 = new byte[dataSize14];
-            is14.read(data14, 0, data14.length);
-            is14.close();
+                WavInfo wi14 = new WavInfo();
+                InputStream is14 = getResources().openRawResource(R.raw.simple_comp);
+                dataSize14 = wi14.readHeader(is14);
+                data14 = new byte[dataSize14];
+                is14.read(data14, 0, data14.length);
+                is14.close();
 
-            WavInfo wi15 = new WavInfo();
-            InputStream is15 = getResources().openRawResource(R.raw.lead1);
-            dataSize15 = wi15.readHeader(is15);
-            data15 = new byte[dataSize15];
-            is15.read(data15, 0, data15.length);
-            is15.close();
+                WavInfo wi15 = new WavInfo();
+                InputStream is15 = getResources().openRawResource(R.raw.lead1);
+                dataSize15 = wi15.readHeader(is15);
+                data15 = new byte[dataSize15];
+                is15.read(data15, 0, data15.length);
+                is15.close();
 
-            WavInfo wi16 = new WavInfo();
-            InputStream is16 = getResources().openRawResource(R.raw.epic_brass);
-            dataSize16 = wi16.readHeader(is16);
-            data16 = new byte[dataSize16];
-            is16.read(data16, 0, data16.length);
-            is16.close();
+                WavInfo wi16 = new WavInfo();
+                InputStream is16 = getResources().openRawResource(R.raw.epic_brass);
+                dataSize16 = wi16.readHeader(is16);
+                data16 = new byte[dataSize16];
+                is16.read(data16, 0, data16.length);
+                is16.close();
 
-            WavInfo wi17 = new WavInfo();
-            InputStream is17 = getResources().openRawResource(R.raw.jazz_organ);
-            dataSize17 = wi17.readHeader(is17);
-            data17 = new byte[dataSize17];
-            is17.read(data17, 0, data17.length);
-            is17.close();
+                WavInfo wi17 = new WavInfo();
+                InputStream is17 = getResources().openRawResource(R.raw.jazz_organ);
+                dataSize17 = wi17.readHeader(is17);
+                data17 = new byte[dataSize17];
+                is17.read(data17, 0, data17.length);
+                is17.close();
 
-            WavInfo wi18 = new WavInfo();
-            InputStream is18 = getResources().openRawResource(R.raw.live_robot_burp);
-            dataSize18 = wi18.readHeader(is18);
-            data18 = new byte[dataSize18];
-            is18.read(data18, 0, data18.length);
-            is18.close();
+                WavInfo wi18 = new WavInfo();
+                InputStream is18 = getResources().openRawResource(R.raw.live_robot_burp);
+                dataSize18 = wi18.readHeader(is18);
+                data18 = new byte[dataSize18];
+                is18.read(data18, 0, data18.length);
+                is18.close();
 
-            WavInfo wi19 = new WavInfo();
-            InputStream is19 = getResources().openRawResource(R.raw.live_crash);
-            dataSize19 = wi19.readHeader(is19);
-            data19 = new byte[dataSize19];
-            is19.read(data19, 0, data19.length);
-            is19.close();
+                WavInfo wi19 = new WavInfo();
+                InputStream is19 = getResources().openRawResource(R.raw.live_crash);
+                dataSize19 = wi19.readHeader(is19);
+                data19 = new byte[dataSize19];
+                is19.read(data19, 0, data19.length);
+                is19.close();
 
-            WavInfo wi20 = new WavInfo();
-            InputStream is20 = getResources().openRawResource(R.raw.live_effect_1);
-            dataSize20 = wi20.readHeader(is20);
-            data20 = new byte[dataSize20];
-            is20.read(data20, 0, data20.length);
-            is20.close();
+                WavInfo wi20 = new WavInfo();
+                InputStream is20 = getResources().openRawResource(R.raw.live_effect_1);
+                dataSize20 = wi20.readHeader(is20);
+                data20 = new byte[dataSize20];
+                is20.read(data20, 0, data20.length);
+                is20.close();
 
-            WavInfo wi21 = new WavInfo();
-            InputStream is21 = getResources().openRawResource(R.raw.live_808_kick);
-            dataSize21 = wi21.readHeader(is21);
-            data21 = new byte[dataSize21];
-            is21.read(data21, 0, data21.length);
-            is21.close();
+                WavInfo wi21 = new WavInfo();
+                InputStream is21 = getResources().openRawResource(R.raw.live_808_kick);
+                dataSize21 = wi21.readHeader(is21);
+                data21 = new byte[dataSize21];
+                is21.read(data21, 0, data21.length);
+                is21.close();
 
-            WavInfo wi22 = new WavInfo();
-            InputStream is22 = getResources().openRawResource(R.raw.live_exotic_tomb);
-            dataSize22 = wi22.readHeader(is22);
-            data22 = new byte[dataSize22];
-            is22.read(data22, 0, data22.length);
-            is22.close();
+                WavInfo wi22 = new WavInfo();
+                InputStream is22 = getResources().openRawResource(R.raw.live_exotic_tomb);
+                dataSize22 = wi22.readHeader(is22);
+                data22 = new byte[dataSize22];
+                is22.read(data22, 0, data22.length);
+                is22.close();
 
-            WavInfo wi23 = new WavInfo();
-            InputStream is23 = getResources().openRawResource(R.raw.live_longassnare);
-            dataSize23 = wi23.readHeader(is23);
-            data23 = new byte[dataSize23];
-            is23.read(data23, 0, data23.length);
-            is23.close();
+                WavInfo wi23 = new WavInfo();
+                InputStream is23 = getResources().openRawResource(R.raw.live_longassnare);
+                dataSize23 = wi23.readHeader(is23);
+                data23 = new byte[dataSize23];
+                is23.read(data23, 0, data23.length);
+                is23.close();
 
-            WavInfo wi24 = new WavInfo();
-            InputStream is24 = getResources().openRawResource(R.raw.live_ride);
-            dataSize24 = wi24.readHeader(is24);
-            data24 = new byte[dataSize24];
-            is24.read(data24, 0, data24.length);
-            is24.close();
+                WavInfo wi24 = new WavInfo();
+                InputStream is24 = getResources().openRawResource(R.raw.live_ride);
+                dataSize24 = wi24.readHeader(is24);
+                data24 = new byte[dataSize24];
+                is24.read(data24, 0, data24.length);
+                is24.close();
+                fortyFourFilled=true;
+                Log.d(TAG + "loading", "Finished loading all files.");
+                //
+            } catch (IOException e) {
+                throw e;
+            }
+        }
+        else if(mquality==22)
+        {
+            try {
+                int arraySize=0;
+                Log.d(TAG + "loading", "Starting to load #1");
+                WavInfo wi1 = new WavInfo();
+                Log.d(TAG + "loading", "Attempting to get resource");
+                InputStream is1 = getResources().openRawResource(R.raw.beat1_22);
+                Log.d(TAG + "loading", "Got resource, attempting header");
+                arraySize = wi1.readHeader(is1);
+                Log.d(TAG + "loading", "Read header, attempting to read resource to byte buffer.");
+                data1_22 = new byte[arraySize];
+                is1.read(data1_22, 0, data1_22.length);
+                is1.close();
+                Log.d(TAG + "loading", "Finished loading #1");
+//1,2,3,13,15,16 drums.
+                Log.d(TAG + "loading", "Starting to load #2");
+                WavInfo wi2 = new WavInfo();
+                Log.d(TAG + "loading", "Attempting to get resource");
+                InputStream is2 = getResources().openRawResource(R.raw.beat3_22);
+                Log.d(TAG + "loading", "Got resource, attempting header");
+                arraySize = wi2.readHeader(is2);
+                Log.d(TAG + "loading", "Read header, attempting to read resource to byte buffer.");
+                data2_22 = new byte[arraySize];
+                is2.read(data2_22, 0, data2_22.length);
+                is2.close();
+                Log.d(TAG + "loading", "Finished loading #2");
+                Log.d(TAG + "loading", "Starting loading #3");
+                //
+                WavInfo wi3 = new WavInfo();
+                InputStream is3 = getResources().openRawResource(R.raw.hihat_22);
+                arraySize = wi3.readHeader(is3);
+                data3_22 = new byte[arraySize];
+                is3.read(data3_22, 0, data3_22.length);
+                is3.close();
+                Log.d(TAG + "loading", "Starting loading #4");
+                //
+                WavInfo wi4 = new WavInfo();
+                InputStream is4 = getResources().openRawResource(R.raw.hey_hey_hey_22);
+                arraySize = wi4.readHeader(is4);
+                data4_22 = new byte[arraySize];
+                is4.read(data4_22, 0, data4_22.length);
+                is4.close();
 
-            Log.d(TAG+"loading","Finished loading all files.");
-            //
-        } catch (IOException e) {
-            throw e;
+                WavInfo wi5 = new WavInfo();
+                InputStream is5 = getResources().openRawResource(R.raw.snare_filter_22);
+                arraySize = wi5.readHeader(is5);
+                data5_22 = new byte[arraySize];
+                is5.read(data5_22, 0, data5_22.length);
+                is5.close();
+
+                WavInfo wi6 = new WavInfo();
+                InputStream is6 = getResources().openRawResource(R.raw.kick_snare_dope_22);
+                arraySize = wi6.readHeader(is6);
+                data6_22 = new byte[arraySize];
+                is6.read(data6_22, 0, data6_22.length);
+                is6.close();
+
+                WavInfo wi7 = new WavInfo();
+                InputStream is7 = getResources().openRawResource(R.raw.sub_bass1_22);
+                arraySize = wi7.readHeader(is7);
+                data7_22 = new byte[arraySize];
+                is7.read(data7_22, 0, data7_22.length);
+                is7.close();
+
+                WavInfo wi8 = new WavInfo();
+                InputStream is8 = getResources().openRawResource(R.raw.sub_bass2_22);
+                arraySize = wi8.readHeader(is8);
+                data8_22 = new byte[arraySize];
+                is8.read(data8_22, 0, data8_22.length);
+                is8.close();
+
+                WavInfo wi9 = new WavInfo();
+                InputStream is9 = getResources().openRawResource(R.raw.synth_bass_22);
+                arraySize = wi9.readHeader(is9);
+                data9_22 = new byte[arraySize];
+                is9.read(data9_22, 0, data9_22.length);
+                is9.close();
+
+                WavInfo wi10 = new WavInfo();
+                InputStream is10 = getResources().openRawResource(R.raw.chords_22);
+                arraySize = wi10.readHeader(is10);
+                data10_22 = new byte[arraySize];
+                is10.read(data10_22, 0, data10_22.length);
+                is10.close();
+
+                WavInfo wi11 = new WavInfo();
+                InputStream is11 = getResources().openRawResource(R.raw.clarinet_chords_22);
+                arraySize = wi11.readHeader(is11);
+                data11_22 = new byte[arraySize];
+                is11.read(data11_22, 0, data11_22.length);
+                is11.close();
+
+                WavInfo wi12 = new WavInfo();
+                InputStream is12 = getResources().openRawResource(R.raw.bright_strings_22);
+                arraySize = wi12.readHeader(is12);
+                data12_22 = new byte[arraySize];
+                is12.read(data12_22, 0, data12_22.length);
+                is12.close();
+
+                WavInfo wi13 = new WavInfo();
+                InputStream is13 = getResources().openRawResource(R.raw.boxy_synth_22);//boxy
+                arraySize = wi13.readHeader(is13);
+                data13_22 = new byte[arraySize];
+                is13.read(data13_22, 0, data13_22.length);
+                is13.close();
+
+                WavInfo wi14 = new WavInfo();
+                InputStream is14 = getResources().openRawResource(R.raw.simple_comp_22);
+                arraySize = wi14.readHeader(is14);
+                data14_22 = new byte[arraySize];
+                is14.read(data14_22, 0, data14_22.length);
+                is14.close();
+
+                WavInfo wi15 = new WavInfo();
+                InputStream is15 = getResources().openRawResource(R.raw.lead1_22);
+                arraySize = wi15.readHeader(is15);
+                data15_22 = new byte[arraySize];
+                is15.read(data15_22, 0, data15_22.length);
+                is15.close();
+
+                WavInfo wi16 = new WavInfo();
+                InputStream is16 = getResources().openRawResource(R.raw.epic_brass_22);
+                arraySize = wi16.readHeader(is16);
+                data16_22 = new byte[arraySize];
+                is16.read(data16_22, 0, data16_22.length);
+                is16.close();
+
+                WavInfo wi17 = new WavInfo();
+                InputStream is17 = getResources().openRawResource(R.raw.jazz_organ_22);
+                arraySize = wi17.readHeader(is17);
+                data17_22 = new byte[arraySize];
+                is17.read(data17_22, 0, data17_22.length);
+                is17.close();
+
+                WavInfo wi18 = new WavInfo();
+                InputStream is18 = getResources().openRawResource(R.raw.live_robot_burp_22);
+                arraySize = wi18.readHeader(is18);
+                data18_22 = new byte[arraySize];
+                is18.read(data18_22, 0, data18_22.length);
+                is18.close();
+
+                WavInfo wi19 = new WavInfo();
+                InputStream is19 = getResources().openRawResource(R.raw.live_crash_22);
+                arraySize = wi19.readHeader(is19);
+                data19_22 = new byte[arraySize];
+                is19.read(data19_22, 0, data19_22.length);
+                is19.close();
+
+                WavInfo wi20 = new WavInfo();
+                InputStream is20 = getResources().openRawResource(R.raw.live_effect_1_22);
+                arraySize = wi20.readHeader(is20);
+                data20_22 = new byte[arraySize];
+                is20.read(data20_22, 0, data20_22.length);
+                is20.close();
+
+                WavInfo wi21 = new WavInfo();
+                InputStream is21 = getResources().openRawResource(R.raw.live_808_kick_22);
+                arraySize = wi21.readHeader(is21);
+                data21_22 = new byte[arraySize];
+                is21.read(data21_22, 0, data21_22.length);
+                is21.close();
+
+                WavInfo wi22 = new WavInfo();
+                InputStream is22 = getResources().openRawResource(R.raw.live_exotic_tomb_22);
+                arraySize = wi22.readHeader(is22);
+                data22_22 = new byte[arraySize];
+                is22.read(data22_22, 0, data22_22.length);
+                is22.close();
+
+                WavInfo wi23 = new WavInfo();
+                InputStream is23 = getResources().openRawResource(R.raw.live_longassnare_22);
+                arraySize = wi23.readHeader(is23);
+                data23_22 = new byte[arraySize];
+                is23.read(data23_22, 0, data23_22.length);
+                is23.close();
+
+                WavInfo wi24 = new WavInfo();
+                InputStream is24 = getResources().openRawResource(R.raw.live_ride_22);
+                arraySize = wi24.readHeader(is24);
+                data24_22 = new byte[arraySize];
+                is24.read(data24_22, 0, data24_22.length);
+                is24.close();
+                twentyTwoFilled=true;
+                Log.d(TAG + "loading", "Finished loading all files.");
+                //
+            } catch (IOException e) {
+                throw e;
+            }
         }
         Log.d(TAG+"fill","Exiting fill all buffers");
         return true;

@@ -12,4 +12,6 @@ The little star you can click for rating was created by open clip art creator \'
 For more info, see <a href="www.gnyrftacode.se/trap-music-pads"> www.gnyrftacode.se/trap-music-pads</a>
 Bugs, praise, suggestions and rants are gratefully accepted at gnyrfta@gmail.com]]> </string>
     <string name="rating">Rating: </string>
+    <string name="fortyfour">44.1 khz</string>
+    <string name="twentytwo">22.05 khz</string>
 </resources>

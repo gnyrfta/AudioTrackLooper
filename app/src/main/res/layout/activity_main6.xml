@@ -38,6 +38,7 @@
                 android:background="@drawable/inset_info"
                 android:layout_weight="1"
                 />
+            <!-- Uncomment to add qualityButton.
             <ImageButton
                 android:id="@+id/qualityButton"
                 android:layout_width="wrap_content"
@@ -50,7 +51,7 @@
                 android:paddingLeft="5px"
                 android:paddingTop="2px"
                 android:paddingBottom="2px"
-                android:paddingRight="10px"/>
+                android:paddingRight="10px"/>-->
 
         </LinearLayout>
         <LinearLayout
